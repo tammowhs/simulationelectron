@@ -15,6 +15,7 @@ function createWindow () {
         icon: `file://${__dirname}/dist/assets/logo.png`
     })
 
+    win.setMenuBarVisibility(false);
 
     win.loadURL(url.format({
         pathname: path.join(`${__dirname}/dist/index.html`),
