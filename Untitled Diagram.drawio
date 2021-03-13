@@ -1,9 +1,12 @@
-<mxfile host="app.diagrams.net" modified="2021-03-13T09:23:26.668Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36 OPR/74.0.3911.203" etag="_GxcVklgzyJyYNY19RvH" version="14.4.6" type="github">
+<mxfile host="app.diagrams.net" modified="2021-03-13T09:42:13.726Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36 OPR/74.0.3911.203" etag="1B_-fptrP_HD7EysbIIw" version="14.4.6" type="github">
   <diagram id="1iYBLRHVPNhLpC0BJ63J" name="Page-1">
     <mxGraphModel dx="1382" dy="764" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="TaedzeyRGepdE8LKF5ip-233" value="Window Title" style="strokeWidth=1;shadow=0;dashed=0;align=center;html=1;shape=mxgraph.mockup.containers.window;align=left;verticalAlign=top;spacingLeft=8;strokeColor2=#008cff;strokeColor3=#c4c4c4;fontColor=#666666;mainText=;fontSize=17;labelBackgroundColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="20" y="10" width="800" height="420" as="geometry" />
+        </mxCell>
         <mxCell id="TaedzeyRGepdE8LKF5ip-1" value="" style="shape=table;html=1;whiteSpace=wrap;startSize=0;container=1;collapsible=0;childLayout=tableLayout;" vertex="1" parent="1">
           <mxGeometry x="330" y="80" width="299" height="300" as="geometry" />
         </mxCell>
@@ -584,19 +587,19 @@
           <mxGeometry x="155" y="140" width="40" height="20" as="geometry" />
         </mxCell>
         <mxCell id="TaedzeyRGepdE8LKF5ip-207" value="" style="line;strokeWidth=4;html=1;perimeter=backbonePerimeter;points=[];outlineConnect=0;" vertex="1" parent="1">
-          <mxGeometry x="40" y="230" width="160" height="10" as="geometry" />
+          <mxGeometry x="40" y="220" width="160" height="10" as="geometry" />
         </mxCell>
         <mxCell id="TaedzeyRGepdE8LKF5ip-208" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
-          <mxGeometry x="80" y="225" width="20" height="20" as="geometry" />
+          <mxGeometry x="80" y="215" width="20" height="20" as="geometry" />
         </mxCell>
         <mxCell id="TaedzeyRGepdE8LKF5ip-209" value="Übertragungsrate" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
-          <mxGeometry x="40" y="200" width="90" height="20" as="geometry" />
+          <mxGeometry x="40" y="190" width="90" height="20" as="geometry" />
         </mxCell>
         <mxCell id="TaedzeyRGepdE8LKF5ip-210" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="150" y="200" width="50" height="20" as="geometry" />
+          <mxGeometry x="150" y="190" width="50" height="20" as="geometry" />
         </mxCell>
         <mxCell id="TaedzeyRGepdE8LKF5ip-211" value="0,3" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
-          <mxGeometry x="155" y="200" width="40" height="20" as="geometry" />
+          <mxGeometry x="155" y="190" width="40" height="20" as="geometry" />
         </mxCell>
         <mxCell id="TaedzeyRGepdE8LKF5ip-212" value="Play / Pause" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="230" y="120" width="80" height="35" as="geometry" />
@@ -605,19 +608,19 @@
           <mxGeometry x="230" y="180" width="80" height="35" as="geometry" />
         </mxCell>
         <mxCell id="TaedzeyRGepdE8LKF5ip-215" value="" style="line;strokeWidth=4;html=1;perimeter=backbonePerimeter;points=[];outlineConnect=0;" vertex="1" parent="1">
-          <mxGeometry x="40" y="290" width="160" height="10" as="geometry" />
+          <mxGeometry x="40" y="270" width="160" height="10" as="geometry" />
         </mxCell>
         <mxCell id="TaedzeyRGepdE8LKF5ip-216" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
-          <mxGeometry x="150" y="285" width="20" height="20" as="geometry" />
+          <mxGeometry x="150" y="265" width="20" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="TaedzeyRGepdE8LKF5ip-217" value="Parameter 4" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
-          <mxGeometry x="40" y="260" width="80" height="20" as="geometry" />
+        <mxCell id="TaedzeyRGepdE8LKF5ip-217" value="Tägliche Kontakte" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="240" width="100" height="20" as="geometry" />
         </mxCell>
         <mxCell id="TaedzeyRGepdE8LKF5ip-218" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="150" y="260" width="50" height="20" as="geometry" />
+          <mxGeometry x="150" y="240" width="50" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="TaedzeyRGepdE8LKF5ip-219" value="Value" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
-          <mxGeometry x="155" y="260" width="40" height="20" as="geometry" />
+        <mxCell id="TaedzeyRGepdE8LKF5ip-219" value="4" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="155" y="240" width="40" height="20" as="geometry" />
         </mxCell>
         <mxCell id="TaedzeyRGepdE8LKF5ip-220" value="Tag X" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="650" y="80" width="70" height="30" as="geometry" />
@@ -630,6 +633,21 @@
         </mxCell>
         <mxCell id="TaedzeyRGepdE8LKF5ip-223" value="Anteil Todesfälle: 10%" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="650" y="210" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="TaedzeyRGepdE8LKF5ip-225" value="" style="line;strokeWidth=4;html=1;perimeter=backbonePerimeter;points=[];outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="320" width="160" height="10" as="geometry" />
+        </mxCell>
+        <mxCell id="TaedzeyRGepdE8LKF5ip-226" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry x="110" y="315" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="TaedzeyRGepdE8LKF5ip-227" value="Bewegungsradius" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="290" width="100" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="TaedzeyRGepdE8LKF5ip-228" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="150" y="290" width="50" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="TaedzeyRGepdE8LKF5ip-229" value="5" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="155" y="290" width="40" height="20" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
