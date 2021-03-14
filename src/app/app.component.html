@@ -504,8 +504,9 @@
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
 
 <div class="content">
-  <canvas #canvas class="canvas"></canvas>
-  <button (click)="timerRunning=!timerRunning">Play/Pause</button>
+  <canvas #canvas></canvas>
+  <button (click)="toggleSimulationExecution()">Play/Pause</button>
+  {{day | json}}
   <button (click)="simulateStep()">Step</button>
 </div>
 

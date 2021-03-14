@@ -1,8 +1,6 @@
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { empty } from 'rxjs';
-import { NEVER } from 'rxjs';
-import { interval, Subject } from 'rxjs';
-import { dematerialize, filter, materialize, switchMap, takeWhile } from 'rxjs/operators';
+import { interval } from 'rxjs';
+import { filter, takeWhile } from 'rxjs/operators';
 import { GridNode } from './grid-node';
 import { GridState, GridStateColor } from './grid-state.enum';
 
@@ -12,32 +10,44 @@ import { GridState, GridStateColor } from './grid-state.enum';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit, AfterViewInit {
-  width = 600;
-  height = 600;
 
   @ViewChild('canvas', {static: true})
   public canvasRef!: ElementRef<HTMLCanvasElement>;
 
   private context!: CanvasRenderingContext2D;
 
-  private nRows: number = 9;
-  private nCols: number = 9;
+  private nRows: number = 27;
+  private nCols: number = this.nRows;
+  private nodeSize: number = 20;
 
   private grid: GridNode[][] = [];
 
-  public timerRunning: boolean = false;
+  private timerRunning: boolean = false;
+  private simulationEnded: boolean = false;
+  public day: number = 1;
 
   ngOnInit() {
     this.initGrid();
+    this.initPatientZero();
+
     this.initInterval();
 
-    this.canvasRef.nativeElement.width = 30 * 9;
-    this.canvasRef.nativeElement.height = 30 * 9;
+    // const canvas = this.canvasRef.nativeElement;
+    // canvas.width = this.nodeSize * this.nCols;
+    // canvas.height = this.nodeSize * this.nRows;
+
+    this.timerRunning = false;
+    this.simulationEnded = false;
+    this.day = 1;
   }
 
   ngAfterViewInit() {
     const canvas = this.canvasRef.nativeElement;
+    canvas.width = this.nodeSize * this.nCols;
+    canvas.height = this.nodeSize * this.nRows;
+
     this.context = canvas.getContext('2d')!;
+    this.draw();
   }
 
   private initGrid() {
@@ -52,14 +62,24 @@ export class AppComponent implements OnInit, AfterViewInit {
       }
       this.grid.push(row);
     }
-
-    this.grid[4][4].state = GridState.Exposed;
   }
 
-  private initInterval() {
-    interval(1000)
+  private initPatientZero() {
+    const centerRow = Math.floor(this.nRows / 2);
+    const centerCol = Math.floor(this.nCols / 2);
+
+    console.log(centerRow, centerCol);
+
+    this.grid[centerRow][centerCol].state = GridState.Exposed;
+  }
+
+  private initInterval(fps: number = 3) {
+    const period = 1000 / fps;
+
+    interval(period)
     .pipe(
-      filter(() => this.timerRunning)
+      filter(() => this.timerRunning),
+      takeWhile(() => !this.simulationEnded),
     )
     .subscribe(val => {
       console.log('tick', val);
@@ -67,7 +87,20 @@ export class AppComponent implements OnInit, AfterViewInit {
     });
   }
 
+  public toggleSimulationExecution() {
+    if(this.simulationEnded) {
+      console.log("reset");
+
+      this.ngOnInit();
+      this.draw();
+    } else {
+      console.log("Toggling");
+      this.timerRunning = !this.timerRunning;
+    }
+  }
+
   public simulateStep() {
+    this.day++;
     // let actualRemovedCells = 0;
     // let linkedNodes: Set<GridNode> = new Set();
 
@@ -111,7 +144,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       }
     }
 
-    let currentlyInfected = 0;
+    let currentlyInfectious = 0;
     let currentlyRecovered = 0;
     let currentlyDeceased = 0;
     for (let r = 0; r < this.nRows; r++) {
@@ -127,7 +160,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         }
 
         if (node.isInfectious) {
-          currentlyInfected++;
+          currentlyInfectious++;
         }
       }
     }
@@ -148,13 +181,15 @@ export class AppComponent implements OnInit, AfterViewInit {
     // });
 
     this.draw();
+
+    this.simulationEnded = currentlyInfectious === 0;
   }
 
   private maybeInfect(node: GridNode, r: number, c: number) {
     let neighbors: GridNode[] = [];
     if (node.isInfectious) {
       neighbors = this.getNeighbors(r, c);
-      let transProb = 0.15;
+      let transProb = 0.33;
       // transProb = Math.pow(transProb, 3);
 
       for (let neighbor of neighbors) {
@@ -186,7 +221,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   private draw() {
     this.context.fillStyle = '#fff';
 
-    const gridWidth = this.nCols * 30;
+    const gridWidth = this.nCols * this.nodeSize;
     this.context.fillRect(0, 0, gridWidth, gridWidth);
 
     for (let r = 0; r < this.nRows; r++) {
@@ -198,9 +233,8 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   drawCell(r: number, c: number, node: GridNode) {
-    let w = 30;
-    let y = r * w;
-    let x = c * w;
+    let y = r * this.nodeSize;
+    let x = c * this.nodeSize;
 
     if (node.isExposed) {
       this.context.fillStyle = GridStateColor.Exposed;
@@ -236,7 +270,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     // }
 
     // context.fillRect(x, y, w, w);
-    this.context.fillRect(x, y, w - gap, w - gap);
+    this.context.fillRect(x, y, this.nodeSize - gap, this.nodeSize - gap);
     // context.beginPath();
     // context.arc(x+w/2, y+w/2, w/2-1, 0, 2 * Math.PI);
     // context.fill();
@@ -265,23 +299,23 @@ export class AppComponent implements OnInit, AfterViewInit {
     // }
   }
 
-  private drawGrid () {
-    let squareSizePx = 28;
-    let paddingLeft = squareSizePx;
-    let paddingTop = squareSizePx;
-    let paddingRight = squareSizePx;
-    let paddingBottom = squareSizePx;
+//   private drawGrid () {
+//     let squareSizePx = 28;
+//     let paddingLeft = squareSizePx;
+//     let paddingTop = squareSizePx;
+//     let paddingRight = squareSizePx;
+//     let paddingBottom = squareSizePx;
     
-    this.context.strokeStyle = 'lightgrey';
-    this.context.beginPath();
-    for (var x = paddingLeft; x <= this.width - paddingRight; x += squareSizePx) {
-       this.context.moveTo(x, paddingTop)
-       this.context.lineTo(x, this.height - paddingBottom)
-    }
-    for (var y = paddingTop; y <= this.height - paddingBottom; y += squareSizePx) {
-       this.context.moveTo(paddingLeft, y)
-       this.context.lineTo(this.width - paddingRight, y)
-    }
-    this.context.stroke()
- }
+//     this.context.strokeStyle = 'lightgrey';
+//     this.context.beginPath();
+//     for (var x = paddingLeft; x <= this.width - paddingRight; x += squareSizePx) {
+//        this.context.moveTo(x, paddingTop)
+//        this.context.lineTo(x, this.height - paddingBottom)
+//     }
+//     for (var y = paddingTop; y <= this.height - paddingBottom; y += squareSizePx) {
+//        this.context.moveTo(paddingLeft, y)
+//        this.context.lineTo(this.width - paddingRight, y)
+//     }
+//     this.context.stroke()
+//  }
 }
