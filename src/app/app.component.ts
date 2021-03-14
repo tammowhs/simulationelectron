@@ -4,6 +4,7 @@ import { NEVER } from 'rxjs';
 import { interval, Subject } from 'rxjs';
 import { dematerialize, filter, materialize, switchMap, takeWhile } from 'rxjs/operators';
 import { GridNode } from './grid-node';
+import { GridState, GridStateColor } from './grid-state.enum';
 
 @Component({
   selector: 'app-root',
@@ -29,6 +30,9 @@ export class AppComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     this.initGrid();
     this.initInterval();
+
+    this.canvasRef.nativeElement.width = 30 * 9;
+    this.canvasRef.nativeElement.height = 30 * 9;
   }
 
   ngAfterViewInit() {
@@ -48,6 +52,8 @@ export class AppComponent implements OnInit, AfterViewInit {
       }
       this.grid.push(row);
     }
+
+    this.grid[4][4].state = GridState.Exposed;
   }
 
   private initInterval() {
@@ -55,10 +61,13 @@ export class AppComponent implements OnInit, AfterViewInit {
     .pipe(
       filter(() => this.timerRunning)
     )
-    .subscribe(val => console.log(val));
+    .subscribe(val => {
+      console.log('tick', val);
+      this.simulateStep();
+    });
   }
 
-  private simulateStep() {
+  public simulateStep() {
     // let actualRemovedCells = 0;
     // let linkedNodes: Set<GridNode> = new Set();
 
@@ -66,7 +75,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     for (let r = 0; r < this.nRows; r++) {
       for (let c = 0; c < this.nCols; c++) {
         let node = this.grid[r][c];
-        node.startDay();
+        node.nextState = node.state;
       }
     }
 
@@ -83,16 +92,6 @@ export class AppComponent implements OnInit, AfterViewInit {
       }
     }
 
-    let actualInfectedNodes = 0;
-    for (let r = 0; r < this.nRows; r++) {
-      for (let c = 0; c < this.nCols; c++) {
-        let node = this.grid[r][c];
-        if (node.isInfectious) {
-          actualInfectedNodes++;
-        }
-      }
-    }
-
     // let chanceOfIsolationAfterSymptoms = this.state.chanceOfIsolationAfterSymptoms;
     // if (!this.props.showChanceOfIsolationAfterSymptomsSlider) {
     //   chanceOfIsolationAfterSymptoms = 0;
@@ -102,27 +101,36 @@ export class AppComponent implements OnInit, AfterViewInit {
 
     const daysIncubating = 2;
     const daysSymptomatic = 2;
-    const showDeaths = false;
-    const deathRate = 0.15;
+    // const showDeaths = false;
+    // const deathRate = 0.15;
 
     for (let r = 0; r < this.nRows; r++) {
       for (let c = 0; c < this.nCols; c++) {
         let node = this.grid[r][c];
-        node.endDay(daysIncubating,  daysSymptomatic, showDeaths, deathRate);
+        node.evaluateNewState(daysIncubating,  daysSymptomatic);
       }
     }
-    // let actualDeadNodes = 0;
-    // let actualRecoveredNodes = 0;
-    // for (let r = 0; r < nRows; r++) {
-    //   for (let c = 0; c < nCols; c++) {
-    //     let node = this.grid[r][c];
-    //     if (node.getNextState() === Constants.REMOVED) {
-    //       actualRecoveredNodes++;
-    //     } else if (node.getNextState() === Constants.DEAD) {
-    //       actualDeadNodes++;
-    //     }
-    //   }
-    // }
+
+    let currentlyInfected = 0;
+    let currentlyRecovered = 0;
+    let currentlyDeceased = 0;
+    for (let r = 0; r < this.nRows; r++) {
+      for (let c = 0; c < this.nCols; c++) {
+        let node = this.grid[r][c];
+        
+        if (node.isRecovered) {
+          currentlyRecovered++;
+        }
+
+        if (node.isDeceased) {
+          currentlyDeceased++;
+        }
+
+        if (node.isInfectious) {
+          currentlyInfected++;
+        }
+      }
+    }
 
 
 
@@ -139,21 +147,20 @@ export class AppComponent implements OnInit, AfterViewInit {
     //   playing: this.state.playing && actualInfectedNodes !== 0,
     // });
 
-    // this.redraw(true);
+    this.draw();
   }
 
-  private maybeInfect(node: GridNode, r: number, c: number): GridNode[] {
+  private maybeInfect(node: GridNode, r: number, c: number) {
     let neighbors: GridNode[] = [];
     if (node.isInfectious) {
       neighbors = this.getNeighbors(r, c);
       let transProb = 0.15;
-      transProb = Math.pow(transProb, 3);
+      // transProb = Math.pow(transProb, 3);
 
       for (let neighbor of neighbors) {
         node.tryToInfect(neighbor, transProb);
       }
     }
-    return neighbors;
   }
 
   private getNeighbors(r: number, c: number): GridNode[] {
@@ -176,6 +183,87 @@ export class AppComponent implements OnInit, AfterViewInit {
     return neighbors;
   }
 
+  private draw() {
+    this.context.fillStyle = '#fff';
+
+    const gridWidth = this.nCols * 30;
+    this.context.fillRect(0, 0, gridWidth, gridWidth);
+
+    for (let r = 0; r < this.nRows; r++) {
+      for (let c = 0; c < this.nCols; c++) {
+        let node = this.grid[r][c];
+        this.drawCell(r, c, node);
+      }
+    }
+  }
+
+  drawCell(r: number, c: number, node: GridNode) {
+    let w = 30;
+    let y = r * w;
+    let x = c * w;
+
+    if (node.isExposed) {
+      this.context.fillStyle = GridStateColor.Exposed;
+    }
+
+    if (node.isInfected) {
+      this.context.fillStyle = GridStateColor.Infected;
+    } 
+
+    if (node.isRecovered) {
+      this.context.fillStyle = GridStateColor.Recovered;
+    } 
+    
+    if (node.isDeceased) {
+      this.context.fillStyle = GridStateColor.Deceased;
+    }
+    
+    if(node.isReceptive) {
+      // Node is susceptible
+      this.context.fillStyle = GridStateColor.Receptive;
+
+      // if (node.specialDegree !== null) {
+      //   // should be somewhere between 4 and 8
+      //   Utils.assert(node.specialDegree >= 4 && node.specialDegree <= 8, "node.specialDegree should be between 4 and 8; was: " + node.specialDegree);
+      //   let intensity = (node.specialDegree - 4) / 4.0;
+      //   context.fillStyle = Colors.hex(Colors.blend(Colors.makeHex(Grid.SUSCEPTIBLE_COLOR), Colors.makeHex('#BBB'), intensity))
+      // }
+    }
+
+    let gap = 1;
+    // if (this.nodeSize < 5 || this.nodeSize < this.props.nodeSize) {
+    //   gap = 0;
+    // }
+
+    // context.fillRect(x, y, w, w);
+    this.context.fillRect(x, y, w - gap, w - gap);
+    // context.beginPath();
+    // context.arc(x+w/2, y+w/2, w/2-1, 0, 2 * Math.PI);
+    // context.fill();
+
+    // if (highlight || (node.linked && this.state.longDistaceNetworkActive)) {
+    //   // context.beginPath();
+    //   context.lineWidth = 1;
+    //   context.strokeStyle = '#000';
+    //   let left = x - 0.5;
+    //   let wid = w - gap + 1;
+    //   if (x === 0) {
+    //     left = 0.5;
+    //     wid = wid - 1;
+    //   }
+    //   let top = y - 0.5;
+    //   let hei = w - gap + 1;
+    //   if (y === 0) {
+    //     top = 0.5;
+    //     hei = hei - 1;
+    //   }
+    //   // if (node.isIsolating()) {
+    //   //   context.strokeRect(left+1, top+1, wid-2, hei-2);
+    //   // } else {
+    //   context.strokeRect(left, top, wid, hei);
+    //   // }
+    // }
+  }
 
   private drawGrid () {
     let squareSizePx = 28;

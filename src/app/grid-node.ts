@@ -41,15 +41,24 @@ export class GridNode {
     return this._state === GridState.Infected;
   }
 
+  get isRecovered() {
+    return this._state === GridState.Recovered;
+  }
+
+  get isDeceased() {
+    return this._state === GridState.Deceased;
+  }
+
   get isInfectious() {
     return this._state === GridState.Exposed || this._state === GridState.Infected;
   }
 
-  startDay() {
-    this._nextState = this._state;
-  }
+  // startDay() {
+  //   this._nextState = this._state;
+  // }
 
-  endDay(daysIncubating: number, daysSymptomatic: number, allowDeaths: boolean, deathRate: number) {
+  // allowDeaths: boolean, deathRate: number
+  evaluateNewState(daysIncubating: number, daysSymptomatic: number) {
     if (this.nextState !== this.state) {
       this.daysInCurrentState = 0;
       this.state = this.nextState;
@@ -61,20 +70,24 @@ export class GridNode {
           this.state = GridState.Infected;
           this.daysInCurrentState = 0;
         }
-      } else if (this.isInfected) {
+      }
+
+      if (this.isInfected) {
         if (this.daysInCurrentState >= daysSymptomatic) {
           // if (overHospitalCapacity) {
           //   deathRate = deathRate * 2;
           // }
-          if (!allowDeaths) {
-            deathRate = 0;
-          }
 
-          if (Math.random() < deathRate) {
-            this.state = GridState.Deceased;
-          } else {
-            this.state = GridState.Recovered;
-          }
+
+          // if (!allowDeaths) {
+          //   deathRate = 0;
+          // }
+
+          // if (Math.random() < deathRate) {
+          //   this.state = GridState.Deceased;
+          // } else {
+          this.state = GridState.Recovered;
+          // }
 
           this.daysInCurrentState = 0;
         }
