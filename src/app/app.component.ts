@@ -36,7 +36,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   public day: number = 1;
 
   private readonly defaultSimulationParam: SimulationParameter = {
-    daysIncubating: 2,
+    daysIncubated: 2,
     daysSymptomatic: 2,
     transmissionProbability: 0.33,
     deathRate: 0.15,
@@ -119,7 +119,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   private initForm() {
     this.paramForm = this.formBuilder.group({
-      'daysIncubating': [this.defaultSimulationParam.daysIncubating, Validators.required],
+      'daysIncubated': [this.defaultSimulationParam.daysIncubated, Validators.required],
       'daysSymptomatic': [this.defaultSimulationParam.daysSymptomatic, Validators.required],
       'transmissionProbability': [this.defaultSimulationParam.transmissionProbability, Validators.required],
       'deathRate': [this.defaultSimulationParam.deathRate, Validators.required],
@@ -133,7 +133,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       )
       .subscribe((formValue) => {
         console.log(formValue);
-        this.simulationParam.daysIncubating = formValue.daysIncubating;
+        this.simulationParam.daysIncubated = formValue.daysIncubating;
         this.simulationParam.daysSymptomatic = formValue.daysSymptomatic;
         this.simulationParam.transmissionProbability = formValue.transmissionProbability;
         this.simulationParam.deathRate = formValue.deathRate;
@@ -206,7 +206,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     for (let r = 0; r < this.metaParam.nRows; r++) {
       for (let c = 0; c < this.metaParam.nCols; c++) {
         let node = this.grid[r][c];
-        node.evaluateNewState(this.simulationParam.daysIncubating, this.simulationParam.daysSymptomatic, this.simulationParam.deathRate);
+        node.evaluateNewState(this.simulationParam.daysIncubated, this.simulationParam.daysSymptomatic, this.simulationParam.deathRate);
       }
     }
 

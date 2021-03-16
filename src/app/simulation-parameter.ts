@@ -1,5 +1,5 @@
 export class SimulationParameter {
-  daysIncubating: number;
+  daysIncubated: number;
   daysSymptomatic: number;
   transmissionProbability: number;
   deathRate: number;
