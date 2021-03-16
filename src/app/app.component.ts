@@ -11,7 +11,7 @@ import { GridState, GridStateColor } from './grid-state.enum';
 })
 export class AppComponent implements OnInit, AfterViewInit {
 
-  @ViewChild('canvas', {static: true})
+  @ViewChild('canvas', { static: true })
   public canvasRef!: ElementRef<HTMLCanvasElement>;
 
   private context!: CanvasRenderingContext2D;
@@ -77,18 +77,18 @@ export class AppComponent implements OnInit, AfterViewInit {
     const period = 1000 / fps;
 
     interval(period)
-    .pipe(
-      filter(() => this.timerRunning),
-      takeWhile(() => !this.simulationEnded),
-    )
-    .subscribe(val => {
-      console.log('tick', val);
-      this.simulateStep();
-    });
+      .pipe(
+        filter(() => this.timerRunning),
+        takeWhile(() => !this.simulationEnded),
+      )
+      .subscribe(val => {
+        // console.log('tick', val);
+        this.simulateStep();
+      });
   }
 
   public toggleSimulationExecution() {
-    if(this.simulationEnded) {
+    if (this.simulationEnded) {
       console.log("reset");
 
       this.ngOnInit();
@@ -150,17 +150,17 @@ export class AppComponent implements OnInit, AfterViewInit {
     for (let r = 0; r < this.nRows; r++) {
       for (let c = 0; c < this.nCols; c++) {
         let node = this.grid[r][c];
-        
+
+        if (node.isInfectious) {
+          currentlyInfectious++;
+        }
+
         if (node.isRecovered) {
           currentlyRecovered++;
         }
 
         if (node.isDeceased) {
           currentlyDeceased++;
-        }
-
-        if (node.isInfectious) {
-          currentlyInfectious++;
         }
       }
     }
@@ -203,16 +203,16 @@ export class AppComponent implements OnInit, AfterViewInit {
 
     // Just the four cardinal neighbors
     if (r > 0) {
-      neighbors.push(this.grid[r-1][c]);
+      neighbors.push(this.grid[r - 1][c]);
     }
     if (c > 0) {
-      neighbors.push(this.grid[r][c-1]);
+      neighbors.push(this.grid[r][c - 1]);
     }
     if (r < this.grid.length - 1) {
-      neighbors.push(this.grid[r+1][c]);
+      neighbors.push(this.grid[r + 1][c]);
     }
     if (c < this.grid[0].length - 1) {
-      neighbors.push(this.grid[r][c+1]);
+      neighbors.push(this.grid[r][c + 1]);
     }
 
     return neighbors;
@@ -242,17 +242,17 @@ export class AppComponent implements OnInit, AfterViewInit {
 
     if (node.isInfected) {
       this.context.fillStyle = GridStateColor.Infected;
-    } 
+    }
 
     if (node.isRecovered) {
       this.context.fillStyle = GridStateColor.Recovered;
-    } 
-    
+    }
+
     if (node.isDeceased) {
       this.context.fillStyle = GridStateColor.Deceased;
     }
-    
-    if(node.isReceptive) {
+
+    if (node.isReceptive) {
       // Node is susceptible
       this.context.fillStyle = GridStateColor.Receptive;
 
@@ -299,23 +299,23 @@ export class AppComponent implements OnInit, AfterViewInit {
     // }
   }
 
-//   private drawGrid () {
-//     let squareSizePx = 28;
-//     let paddingLeft = squareSizePx;
-//     let paddingTop = squareSizePx;
-//     let paddingRight = squareSizePx;
-//     let paddingBottom = squareSizePx;
-    
-//     this.context.strokeStyle = 'lightgrey';
-//     this.context.beginPath();
-//     for (var x = paddingLeft; x <= this.width - paddingRight; x += squareSizePx) {
-//        this.context.moveTo(x, paddingTop)
-//        this.context.lineTo(x, this.height - paddingBottom)
-//     }
-//     for (var y = paddingTop; y <= this.height - paddingBottom; y += squareSizePx) {
-//        this.context.moveTo(paddingLeft, y)
-//        this.context.lineTo(this.width - paddingRight, y)
-//     }
-//     this.context.stroke()
-//  }
+  //   private drawGrid () {
+  //     let squareSizePx = 28;
+  //     let paddingLeft = squareSizePx;
+  //     let paddingTop = squareSizePx;
+  //     let paddingRight = squareSizePx;
+  //     let paddingBottom = squareSizePx;
+
+  //     this.context.strokeStyle = 'lightgrey';
+  //     this.context.beginPath();
+  //     for (var x = paddingLeft; x <= this.width - paddingRight; x += squareSizePx) {
+  //        this.context.moveTo(x, paddingTop)
+  //        this.context.lineTo(x, this.height - paddingBottom)
+  //     }
+  //     for (var y = paddingTop; y <= this.height - paddingBottom; y += squareSizePx) {
+  //        this.context.moveTo(paddingLeft, y)
+  //        this.context.lineTo(this.width - paddingRight, y)
+  //     }
+  //     this.context.stroke()
+  //  }
 }

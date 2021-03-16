@@ -96,7 +96,7 @@ export class GridNode {
   }
 
   tryToInfect(neighbor: GridNode, transProb: number) {
-    // Can get infected ?    
+    // Can get infected ?
     if (neighbor.isReceptive && Math.random() < transProb) {
       neighbor.nextState = GridState.Exposed;
     }
