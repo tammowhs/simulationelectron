@@ -133,7 +133,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       )
       .subscribe((formValue) => {
         console.log(formValue);
-        this.simulationParam.daysIncubated = formValue.daysIncubating;
+        this.simulationParam.daysIncubated = formValue.daysIncubated;
         this.simulationParam.daysSymptomatic = formValue.daysSymptomatic;
         this.simulationParam.transmissionProbability = formValue.transmissionProbability;
         this.simulationParam.deathRate = formValue.deathRate;
