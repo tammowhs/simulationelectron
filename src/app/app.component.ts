@@ -1,9 +1,11 @@
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { interval } from 'rxjs';
-import { filter, takeWhile } from 'rxjs/operators';
+import { debounceTime, filter, takeWhile } from 'rxjs/operators';
 import { GridNode } from './grid-node';
 import { GridState, GridStateColor } from './grid-state.enum';
 import { MetaParameter } from './meta-parameter';
+import { RandomService } from './random.service';
 import { SimulationParameter } from './simulation-parameter';
 import { Statistic } from './statistic';
 
@@ -15,14 +17,14 @@ import { Statistic } from './statistic';
 export class AppComponent implements OnInit, AfterViewInit {
 
   @ViewChild('canvas', { static: true })
-  public canvasRef!: ElementRef<HTMLCanvasElement>;
+  public canvasRef: ElementRef<HTMLCanvasElement>;
 
-  private context!: CanvasRenderingContext2D;
+  private context: CanvasRenderingContext2D;
 
   private metaParam: MetaParameter = {
-    nRows: 27,
-    nCols: 27,
-    nodeSize: 20,
+    nRows: 69,
+    nCols: 69,
+    nodeSize: 10,
     stepsPerSecond: 4,
   }
 
@@ -33,15 +35,26 @@ export class AppComponent implements OnInit, AfterViewInit {
   public simulationEnded: boolean = false;
   public day: number = 1;
 
-  private simulationParam: SimulationParameter = {
+  private readonly defaultSimulationParam: SimulationParameter = {
     daysIncubating: 2,
     daysSymptomatic: 2,
     transmissionProbability: 0.33,
     deathRate: 0.15,
+    movementRadius: 1,
+    numberOfContacts: 4,
   };
 
+  private simulationParam: SimulationParameter = this.defaultSimulationParam;
+
+  form: FormGroup;
+
+
+  constructor(
+    private randomService: RandomService,
+    private formBuilder: FormBuilder) { }
 
   ngOnInit() {
+    this.initForm();
     this.initGrid();
     this.initPatientZero();
 
@@ -85,8 +98,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     const centerRow = Math.floor(this.metaParam.nRows / 2);
     const centerCol = Math.floor(this.metaParam.nCols / 2);
 
-    console.log(centerRow, centerCol);
-
     this.grid[centerRow][centerCol].state = GridState.Exposed;
   }
 
@@ -101,6 +112,24 @@ export class AppComponent implements OnInit, AfterViewInit {
       .subscribe(val => {
         // console.log('tick', val);
         this.simulateStep();
+      });
+  }
+
+  private initForm() {
+    this.form = this.formBuilder.group({
+      'movementRadius': [this.defaultSimulationParam.movementRadius, Validators.required],
+      'numberOfContacts': [this.defaultSimulationParam.numberOfContacts, Validators.required]
+    });
+
+    this.form.valueChanges
+      .pipe(
+        debounceTime(200)
+      )
+      .subscribe((formValue) => {
+        console.log(formValue);
+        this.simulationParam.movementRadius = formValue.movementRadius;
+        this.simulationParam.numberOfContacts = formValue.numberOfContacts;
+        console.log(this.simulationParam);
       });
   }
 
@@ -137,7 +166,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         // if (this.props.showInteractions && this.isCenterNode(r, c) && node.canInfectOthers()) {
         //   centerNodeNeighborsToDisplay = this.maybeInfect(node, r, c, linkedNodes);
         // } else {
-        this.maybeInfect(node, r, c);
+        this.tryToInfect(node, r, c);
         // }
       }
     }
@@ -202,19 +231,45 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.simulationEnded = currentlyInfectious === 0;
   }
 
-  private maybeInfect(node: GridNode, r: number, c: number) {
-    let neighbors: GridNode[] = [];
+  private tryToInfect(node: GridNode, r: number, c: number) {
+    let contacts: GridNode[] = [];
     if (node.isInfectious) {
-      neighbors = this.getNeighbors(r, c);
-      // transProb = Math.pow(transProb, 3);
 
-      for (let neighbor of neighbors) {
+      contacts = this.findContacts(r, c, this.simulationParam.movementRadius, this.simulationParam.numberOfContacts);
+
+      // console.log(contacts.map(node => `row: ${node.rowIndex}, col: ${node.colIndex}, nextState: ${node.nextState}`));
+
+      // contacts = this.findNeighbors(r, c);
+
+      // transProb = Math.pow(transProb, 3);
+      for (let neighbor of contacts) {
         node.tryToInfect(neighbor, this.simulationParam.transmissionProbability);
       }
     }
   }
 
-  private getNeighbors(r: number, c: number): GridNode[] {
+  private findContacts(row: number, col: number, radius: number, countNodes: number): GridNode[] {
+    let contacts: GridNode[] = [];
+
+    for (let i = 0; i < countNodes; i++) {
+      const rowDeviation = this.randomService.randomInRange(radius * -1, radius);
+      const colDeviation = this.randomService.randomInRange(radius * -1, radius);
+
+      if (rowDeviation === 0 && colDeviation === 0) {
+        i--;
+        continue;
+      }
+
+      if (this.isNodeInGrid(row + rowDeviation, col + colDeviation)) {
+        const node = this.grid[row + rowDeviation][col + colDeviation];
+        contacts.push(node);
+      }
+    }
+
+    return contacts;
+  }
+
+  private findNeighbors(r: number, c: number): GridNode[] {
     let neighbors: GridNode[] = [];
 
     // Just the four cardinal neighbors
@@ -232,6 +287,10 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
 
     return neighbors;
+  }
+
+  private isNodeInGrid(r: number, c: number): boolean {
+    return r >= 0 && c >= 0 && r < this.grid.length && c < this.grid[0].length;
   }
 
   private draw() {

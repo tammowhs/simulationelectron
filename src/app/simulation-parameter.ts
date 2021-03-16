@@ -3,4 +3,6 @@ export class SimulationParameter {
   daysSymptomatic: number;
   transmissionProbability: number;
   deathRate: number;
+  movementRadius: number;
+  numberOfContacts: number;
 }

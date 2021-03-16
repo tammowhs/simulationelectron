@@ -508,6 +508,16 @@
   <button (click)="toggleSimulationExecution()">Play/Pause</button>
   {{day | json}}
   <button (click)="simulateStep()" [disabled]="simulationEnded">Step</button>
+  <div [formGroup]="form">
+    <div>
+      <label>Bewegungsradius</label>
+      <input type="range" min="0" max="20" step="1" formControlName="movementRadius">
+    </div>
+    <div>
+      <label>Kontaktanzahl</label>
+      <input type="range" min="0" max="10" step="1" formControlName="numberOfContacts">
+    </div>
+  </div>
   <div *ngFor="let statistic of statistics">
     {{statistic | json}}
   </div>

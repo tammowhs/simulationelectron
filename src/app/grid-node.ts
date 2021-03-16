@@ -1,8 +1,8 @@
 import { GridState } from "./grid-state.enum";
 
 export class GridNode {
-  private rowIndex: number;
-  private colIndex: number;
+  public rowIndex: number;
+  public colIndex: number;
 
   private _state: GridState = GridState.Receptive;
   private _nextState: GridState = GridState.Receptive;
