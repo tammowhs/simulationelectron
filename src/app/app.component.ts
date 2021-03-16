@@ -25,7 +25,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     nRows: 69,
     nCols: 69,
     nodeSize: 10,
-    stepsPerSecond: 4,
+    stepsPerSecond: 2,
   }
 
   private grid: GridNode[][] = [];
@@ -44,9 +44,9 @@ export class AppComponent implements OnInit, AfterViewInit {
     numberOfContacts: 4,
   };
 
-  private simulationParam: SimulationParameter = this.defaultSimulationParam;
+  private simulationParam: SimulationParameter;
 
-  form: FormGroup;
+  paramForm: FormGroup;
 
 
   constructor(
@@ -55,6 +55,8 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     this.initForm();
+    this.simulationParam = { ...this.paramForm.value };
+
     this.initGrid();
     this.initPatientZero();
 
@@ -116,20 +118,27 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   private initForm() {
-    this.form = this.formBuilder.group({
+    this.paramForm = this.formBuilder.group({
+      'daysIncubating': [this.defaultSimulationParam.daysIncubating, Validators.required],
+      'daysSymptomatic': [this.defaultSimulationParam.daysSymptomatic, Validators.required],
+      'transmissionProbability': [this.defaultSimulationParam.transmissionProbability, Validators.required],
+      'deathRate': [this.defaultSimulationParam.deathRate, Validators.required],
       'movementRadius': [this.defaultSimulationParam.movementRadius, Validators.required],
       'numberOfContacts': [this.defaultSimulationParam.numberOfContacts, Validators.required]
     });
 
-    this.form.valueChanges
+    this.paramForm.valueChanges
       .pipe(
         debounceTime(200)
       )
       .subscribe((formValue) => {
         console.log(formValue);
+        this.simulationParam.daysIncubating = formValue.daysIncubating;
+        this.simulationParam.daysSymptomatic = formValue.daysSymptomatic;
+        this.simulationParam.transmissionProbability = formValue.transmissionProbability;
+        this.simulationParam.deathRate = formValue.deathRate;
         this.simulationParam.movementRadius = formValue.movementRadius;
         this.simulationParam.numberOfContacts = formValue.numberOfContacts;
-        console.log(this.simulationParam);
       });
   }
 
@@ -137,7 +146,24 @@ export class AppComponent implements OnInit, AfterViewInit {
     if (this.simulationEnded) {
       console.log("reset");
 
-      this.ngOnInit();
+      this.initForm();
+      this.simulationParam = { ...this.paramForm.value };
+      this.initGrid();
+      this.initPatientZero();
+
+      this.initInterval();
+
+      this.timerRunning = false;
+      this.simulationEnded = false;
+      this.day = 1;
+
+      this.statistics = [{ infectious: 1, recovered: 0, deceased: 0 }];
+
+      console.log('formValue', this.paramForm.value);
+      console.log('simParam', this.simulationParam);
+      console.log('defSimParam', this.defaultSimulationParam);
+
+
       this.draw();
     } else {
       console.log("Toggling");
