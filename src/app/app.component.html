@@ -507,7 +507,7 @@
   <canvas #canvas></canvas>
   <button (click)="toggleSimulationExecution()">Play/Pause</button>
   {{day | json}}
-  <button (click)="simulateStep()">Step</button>
+  <button (click)="simulateStep()" [disabled]="simulationEnded">Step</button>
   <div *ngFor="let statistic of statistics">
     {{statistic | json}}
   </div>

@@ -3,6 +3,8 @@ import { interval } from 'rxjs';
 import { filter, takeWhile } from 'rxjs/operators';
 import { GridNode } from './grid-node';
 import { GridState, GridStateColor } from './grid-state.enum';
+import { MetaParameter } from './meta-parameter';
+import { SimulationParameter } from './simulation-parameter';
 import { Statistic } from './statistic';
 
 @Component({
@@ -17,17 +19,27 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   private context!: CanvasRenderingContext2D;
 
-  private nRows: number = 27;
-  private nCols: number = this.nRows;
-  private nodeSize: number = 20;
+  private metaParam: MetaParameter = {
+    nRows: 27,
+    nCols: 27,
+    nodeSize: 20,
+    stepsPerSecond: 4,
+  }
 
   private grid: GridNode[][] = [];
-
   public statistics: Statistic[];
 
   private timerRunning: boolean = false;
-  private simulationEnded: boolean = false;
+  public simulationEnded: boolean = false;
   public day: number = 1;
+
+  private simulationParam: SimulationParameter = {
+    daysIncubating: 2,
+    daysSymptomatic: 2,
+    transmissionProbability: 0.33,
+    deathRate: 0.15,
+  };
+
 
   ngOnInit() {
     this.initGrid();
@@ -48,8 +60,8 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     const canvas = this.canvasRef.nativeElement;
-    canvas.width = this.nodeSize * this.nCols;
-    canvas.height = this.nodeSize * this.nRows;
+    canvas.width = this.metaParam.nodeSize * this.metaParam.nCols;
+    canvas.height = this.metaParam.nodeSize * this.metaParam.nRows;
 
     this.context = canvas.getContext('2d')!;
     this.draw();
@@ -57,9 +69,9 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   private initGrid() {
     this.grid = [];
-    for (let r = 0; r < this.nRows; r++) {
+    for (let r = 0; r < this.metaParam.nRows; r++) {
       let row = [];
-      for (let c = 0; c < this.nCols; c++) {
+      for (let c = 0; c < this.metaParam.nCols; c++) {
         let node = new GridNode(r, c);
         // node.immune = this.rng.random() < this.state.immunityFraction;
 
@@ -70,17 +82,17 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   private initPatientZero() {
-    const centerRow = Math.floor(this.nRows / 2);
-    const centerCol = Math.floor(this.nCols / 2);
+    const centerRow = Math.floor(this.metaParam.nRows / 2);
+    const centerCol = Math.floor(this.metaParam.nCols / 2);
 
     console.log(centerRow, centerCol);
 
     this.grid[centerRow][centerCol].state = GridState.Exposed;
   }
 
-  private initInterval(fps: number = 3) {
-    const period = 1000 / fps;
+  private initInterval() {
 
+    const period = 1000 / this.metaParam.stepsPerSecond;
     interval(period)
       .pipe(
         filter(() => this.timerRunning),
@@ -110,8 +122,8 @@ export class AppComponent implements OnInit, AfterViewInit {
     // let linkedNodes: Set<GridNode> = new Set();
 
     // Start day
-    for (let r = 0; r < this.nRows; r++) {
-      for (let c = 0; c < this.nCols; c++) {
+    for (let r = 0; r < this.metaParam.nRows; r++) {
+      for (let c = 0; c < this.metaParam.nCols; c++) {
         let node = this.grid[r][c];
         node.nextState = node.state;
       }
@@ -119,8 +131,8 @@ export class AppComponent implements OnInit, AfterViewInit {
 
     // Infect
     // let centerNodeNeighborsToDisplay = [];
-    for (let r = 0; r < this.nRows; r++) {
-      for (let c = 0; c < this.nCols; c++) {
+    for (let r = 0; r < this.metaParam.nRows; r++) {
+      for (let c = 0; c < this.metaParam.nCols; c++) {
         let node = this.grid[r][c];
         // if (this.props.showInteractions && this.isCenterNode(r, c) && node.canInfectOthers()) {
         //   centerNodeNeighborsToDisplay = this.maybeInfect(node, r, c, linkedNodes);
@@ -136,24 +148,18 @@ export class AppComponent implements OnInit, AfterViewInit {
     // }
     // let overCapacity = this.state.hospitalCapacityPct > -1 && actualInfectedNodes > this.state.hospitalCapacityPct * (nRows*nCols);
 
-
-    const daysIncubating = 2;
-    const daysSymptomatic = 2;
-    // const showDeaths = false;
-    // const deathRate = 0.15;
-
-    for (let r = 0; r < this.nRows; r++) {
-      for (let c = 0; c < this.nCols; c++) {
+    for (let r = 0; r < this.metaParam.nRows; r++) {
+      for (let c = 0; c < this.metaParam.nCols; c++) {
         let node = this.grid[r][c];
-        node.evaluateNewState(daysIncubating,  daysSymptomatic);
+        node.evaluateNewState(this.simulationParam.daysIncubating, this.simulationParam.daysSymptomatic, this.simulationParam.deathRate);
       }
     }
 
     let currentlyInfectious = 0;
     let currentlyRecovered = 0;
     let currentlyDeceased = 0;
-    for (let r = 0; r < this.nRows; r++) {
-      for (let c = 0; c < this.nCols; c++) {
+    for (let r = 0; r < this.metaParam.nRows; r++) {
+      for (let c = 0; c < this.metaParam.nCols; c++) {
         let node = this.grid[r][c];
 
         if (node.isInfectious) {
@@ -176,6 +182,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       deceased: currentlyDeceased,
     });
 
+    console.log(this.statistics[this.statistics.length - 1]);
 
     // this.state.capacityPerDay.push(this.state.hospitalCapacityPct * this.props.gridRows * this.props.gridRows);
     // this.state.deadPerDay.push(actualDeadNodes);
@@ -199,11 +206,10 @@ export class AppComponent implements OnInit, AfterViewInit {
     let neighbors: GridNode[] = [];
     if (node.isInfectious) {
       neighbors = this.getNeighbors(r, c);
-      let transProb = 0.33;
       // transProb = Math.pow(transProb, 3);
 
       for (let neighbor of neighbors) {
-        node.tryToInfect(neighbor, transProb);
+        node.tryToInfect(neighbor, this.simulationParam.transmissionProbability);
       }
     }
   }
@@ -231,11 +237,11 @@ export class AppComponent implements OnInit, AfterViewInit {
   private draw() {
     this.context.fillStyle = '#fff';
 
-    const gridWidth = this.nCols * this.nodeSize;
+    const gridWidth = this.metaParam.nCols * this.metaParam.nodeSize;
     this.context.fillRect(0, 0, gridWidth, gridWidth);
 
-    for (let r = 0; r < this.nRows; r++) {
-      for (let c = 0; c < this.nCols; c++) {
+    for (let r = 0; r < this.metaParam.nRows; r++) {
+      for (let c = 0; c < this.metaParam.nCols; c++) {
         let node = this.grid[r][c];
         this.drawCell(r, c, node);
       }
@@ -243,8 +249,8 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   drawCell(r: number, c: number, node: GridNode) {
-    let y = r * this.nodeSize;
-    let x = c * this.nodeSize;
+    let y = r * this.metaParam.nodeSize;
+    let x = c * this.metaParam.nodeSize;
 
     if (node.isExposed) {
       this.context.fillStyle = GridStateColor.Exposed;
@@ -280,7 +286,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     // }
 
     // context.fillRect(x, y, w, w);
-    this.context.fillRect(x, y, this.nodeSize - gap, this.nodeSize - gap);
+    this.context.fillRect(x, y, this.metaParam.nodeSize - gap, this.metaParam.nodeSize - gap);
     // context.beginPath();
     // context.arc(x+w/2, y+w/2, w/2-1, 0, 2 * Math.PI);
     // context.fill();

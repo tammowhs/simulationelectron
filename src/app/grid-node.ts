@@ -58,7 +58,7 @@ export class GridNode {
   // }
 
   // allowDeaths: boolean, deathRate: number
-  evaluateNewState(daysIncubating: number, daysSymptomatic: number) {
+  evaluateNewState(daysIncubating: number, daysSymptomatic: number, deathRate: number) {
     if (this.nextState !== this.state) {
       this.daysInCurrentState = 0;
       this.state = this.nextState;
@@ -83,11 +83,11 @@ export class GridNode {
           //   deathRate = 0;
           // }
 
-          // if (Math.random() < deathRate) {
-          //   this.state = GridState.Deceased;
-          // } else {
-          this.state = GridState.Recovered;
-          // }
+          if (Math.random() < deathRate) {
+            this.state = GridState.Deceased;
+          } else {
+            this.state = GridState.Recovered;
+          }
 
           this.daysInCurrentState = 0;
         }
