@@ -3,6 +3,7 @@ import { interval } from 'rxjs';
 import { filter, takeWhile } from 'rxjs/operators';
 import { GridNode } from './grid-node';
 import { GridState, GridStateColor } from './grid-state.enum';
+import { Statistic } from './statistic';
 
 @Component({
   selector: 'app-root',
@@ -22,6 +23,8 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   private grid: GridNode[][] = [];
 
+  public statistics: Statistic[];
+
   private timerRunning: boolean = false;
   private simulationEnded: boolean = false;
   public day: number = 1;
@@ -39,6 +42,8 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.timerRunning = false;
     this.simulationEnded = false;
     this.day = 1;
+
+    this.statistics = [{ infectious: 1, recovered: 0, deceased: 0 }];
   }
 
   ngAfterViewInit() {
@@ -120,7 +125,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         // if (this.props.showInteractions && this.isCenterNode(r, c) && node.canInfectOthers()) {
         //   centerNodeNeighborsToDisplay = this.maybeInfect(node, r, c, linkedNodes);
         // } else {
-          this.maybeInfect(node, r, c);
+        this.maybeInfect(node, r, c);
         // }
       }
     }
@@ -165,6 +170,11 @@ export class AppComponent implements OnInit, AfterViewInit {
       }
     }
 
+    this.statistics.push({
+      infectious: currentlyInfectious,
+      recovered: currentlyRecovered,
+      deceased: currentlyDeceased,
+    });
 
 
     // this.state.capacityPerDay.push(this.state.hospitalCapacityPct * this.props.gridRows * this.props.gridRows);

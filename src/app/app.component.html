@@ -508,6 +508,9 @@
   <button (click)="toggleSimulationExecution()">Play/Pause</button>
   {{day | json}}
   <button (click)="simulateStep()">Step</button>
+  <div *ngFor="let statistic of statistics">
+    {{statistic | json}}
+  </div>
 </div>
 
 <router-outlet></router-outlet>
