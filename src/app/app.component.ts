@@ -31,14 +31,14 @@ export class AppComponent implements OnInit, AfterViewInit {
   private grid: GridNode[][] = [];
   public statistics: Statistic[];
 
-  private timerRunning: boolean = false;
-  public simulationEnded: boolean = false;
-  public day: number = 1;
+  private timerRunning: boolean;
+  public simulationEnded: boolean;
+  public day: number;
 
   private readonly defaultSimulationParam: SimulationParameter = {
     daysIncubated: 2,
     daysSymptomatic: 2,
-    transmissionProbability: 0.33,
+    transmissionProbability: 0.35,
     deathRate: 0.15,
     movementRadius: 1,
     numberOfContacts: 4,
@@ -60,15 +60,17 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.initGrid();
     this.initPatientZero();
 
+    this.timerRunning = false;
+    this.simulationEnded = false;
+    this.day = 0;
+
     this.initInterval();
 
     // const canvas = this.canvasRef.nativeElement;
     // canvas.width = this.nodeSize * this.nCols;
     // canvas.height = this.nodeSize * this.nRows;
 
-    this.timerRunning = false;
-    this.simulationEnded = false;
-    this.day = 1;
+
 
     this.statistics = [{ infectious: 1, recovered: 0, deceased: 0 }];
   }
@@ -133,7 +135,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       )
       .subscribe((formValue) => {
         console.log(formValue);
-        this.simulationParam.daysIncubated = formValue.daysIncubating;
+        this.simulationParam.daysIncubated = formValue.daysIncubated;
         this.simulationParam.daysSymptomatic = formValue.daysSymptomatic;
         this.simulationParam.transmissionProbability = formValue.transmissionProbability;
         this.simulationParam.deathRate = formValue.deathRate;
@@ -276,6 +278,10 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   private findContacts(row: number, col: number, radius: number, countNodes: number): GridNode[] {
     let contacts: GridNode[] = [];
+
+    if (radius === 0 || countNodes === 0) {
+      return contacts;
+    }
 
     for (let i = 0; i < countNodes; i++) {
       const rowDeviation = this.randomService.randomInRange(radius * -1, radius);

@@ -503,40 +503,55 @@
 <!-- * * * * * * * * * * End of Placeholder * * * * * * * * * * * -->
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
 
-<div class="content">
-  <canvas #canvas></canvas>
-  <button (click)="toggleSimulationExecution()">Play/Pause</button>
-  {{day | json}}
-  <button (click)="simulateStep()" [disabled]="simulationEnded">Step</button>
+<div fxLayout="row" fxLayoutAlign="space-evenly center">
   <div [formGroup]="paramForm">
     <div>
-      <label>Inkubationszeit</label>
+      <label>Inkubationszeit</label> {{this.paramForm.value.daysIncubated}}
       <input type="range" min="1" max="10" step="1" formControlName="daysIncubated">
     </div>
     <div>
-      <label>Infektionszeit</label>
+      <label>Infektionszeit</label> {{this.paramForm.value.daysSymptomatic}}
       <input type="range" min="1" max="10" step="1" formControlName="daysSymptomatic">
     </div>
     <div>
-      <label>Übertragungsrate</label>
+      <label>Übertragungsrate</label> {{this.paramForm.value.transmissionProbability}}
       <input type="range" min="0" max="1" step="0.05" formControlName="transmissionProbability">
     </div>
     <div>
-      <label>Sterberate</label>
+      <label>Sterberate</label> {{this.paramForm.value.deathRate}}
       <input type="range" min="0" max="1" step="0.1" formControlName="deathRate">
     </div>
     <div>
-      <label>Tägliche Kontakte</label>
+      <label>Tägliche Kontakte</label> {{this.paramForm.value.numberOfContacts}}
       <input type="range" min="0" max="10" step="1" formControlName="numberOfContacts">
     </div>
     <div>
-      <label>Bewegungsradius</label>
-      <input type="range" min="0" max="20" step="1" formControlName="movementRadius">
+      <label>Bewegungsradius</label> {{this.paramForm.value.movementRadius}}
+      <input type="range" min="0" max="10" step="1" formControlName="movementRadius">
     </div>
   </div>
-  <div *ngFor="let statistic of statistics">
-    {{statistic | json}}
+
+  <div>
+    Tag: {{day | json}}
+    <button (click)="toggleSimulationExecution()">Play/Pause</button>
+    <button (click)="simulateStep()" [disabled]="simulationEnded">Step</button>
+  </div>
+
+  <canvas #canvas fxFlex="40"></canvas>
+
+  <div>
+    Statistikbereich
+    <!-- <div *ngFor="let statistic of statistics">
+      {{day | json}} : {{statistic | json}}
+    </div> -->
   </div>
 </div>
+
+<ng-template #labeledSlider let-name="name" let-valueRef="value" let-min="min" let-max="max" let-step="step" let-fCName="formControlName">
+  <div>
+    <label>{{name}}</label> {{valueRef}}
+    <input type="range" [min]="min" [max]="10" [step]="1" [formControlName]="fCName">
+  </div>
+</ng-template>
 
 <router-outlet></router-outlet>
