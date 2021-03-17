@@ -25,7 +25,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     nRows: 69,
     nCols: 69,
     nodeSize: 10,
-    stepsPerSecond: 2,
+    stepsPerSecond: 20,
   }
 
   private grid: GridNode[][] = [];

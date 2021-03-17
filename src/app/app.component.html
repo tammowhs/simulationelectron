@@ -503,54 +503,83 @@
 <!-- * * * * * * * * * * End of Placeholder * * * * * * * * * * * -->
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
 
-<div fxLayout="row" fxLayoutAlign="space-evenly center">
-  <div [formGroup]="paramForm">
-    <div>
+<div fxLayout="row" fxLayoutAlign="start stretch">
+  <div fxFlex="50" fxLayout="column" fxLayoutAlign="start stretch">
+    <div fxFlex="40" fxLayout="row" fxLayoutAlign="start stretch">
+      <div fxFlex="80" [formGroup]="paramForm">
+        <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Inkubationszeit', value: this.paramForm.value.daysIncubated, min: 1, max: 10, step: 1, formControlName: 'daysIncubated'}">
+        </ng-container>
+        <!-- <div>
       <label>Inkubationszeit</label> {{this.paramForm.value.daysIncubated}}
       <input type="range" min="1" max="10" step="1" formControlName="daysIncubated">
-    </div>
-    <div>
+    </div> -->
+
+        <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Infektionszeit', value: this.paramForm.value.daysSymptomatic, min: 1, max: 10, step: 1, formControlName: 'daysSymptomatic'}">
+        </ng-container>
+        <!-- <div>
       <label>Infektionszeit</label> {{this.paramForm.value.daysSymptomatic}}
       <input type="range" min="1" max="10" step="1" formControlName="daysSymptomatic">
-    </div>
-    <div>
+    </div> -->
+
+        <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Übertragungsrate', value: this.paramForm.value.transmissionProbability, min: 0, max: 1, step: 0.05, formControlName: 'transmissionProbability'}">
+        </ng-container>
+        <!-- <div>
       <label>Übertragungsrate</label> {{this.paramForm.value.transmissionProbability}}
       <input type="range" min="0" max="1" step="0.05" formControlName="transmissionProbability">
-    </div>
-    <div>
+    </div> -->
+
+        <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Sterberate', value: this.paramForm.value.deathRate, min: 0, max: 1, step: 0.1, formControlName: 'deathRate'}">
+        </ng-container>
+        <!-- <div>
       <label>Sterberate</label> {{this.paramForm.value.deathRate}}
       <input type="range" min="0" max="1" step="0.1" formControlName="deathRate">
-    </div>
-    <div>
+    </div> -->
+
+        <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Tägliche Kontakte', value: this.paramForm.value.numberOfContacts, min: 0, max: 10, step: 1, formControlName: 'numberOfContacts'}">
+        </ng-container>
+        <!-- <div>
       <label>Tägliche Kontakte</label> {{this.paramForm.value.numberOfContacts}}
       <input type="range" min="0" max="10" step="1" formControlName="numberOfContacts">
-    </div>
-    <div>
+    </div> -->
+
+        <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Bewegungsradius', value: this.paramForm.value.movementRadius, min: 0, max: 10, step: 1, formControlName: 'movementRadius'}">
+        </ng-container>
+        <!-- <div>
       <label>Bewegungsradius</label> {{this.paramForm.value.movementRadius}}
       <input type="range" min="0" max="10" step="1" formControlName="movementRadius">
+    </div> -->
+      </div>
+
+      <div fxFlex="20">
+        <button *ngIf="!simulationEnded" (click)="toggleSimulationExecution()">Play/Pause</button>
+        <button *ngIf="simulationEnded" (click)="toggleSimulationExecution()">Reset</button>
+        <button (click)="simulateStep()" [disabled]="simulationEnded">Step</button>
+      </div>
+    </div>
+
+    <div fxFlex="60">
+      Statistikbereich
+      Tag: {{day | json}}
+      <!-- <div *ngFor="let statistic of statistics">
+        {{statistic | json}}
+      </div> -->
     </div>
   </div>
 
-  <div>
-    Tag: {{day | json}}
-    <button (click)="toggleSimulationExecution()">Play/Pause</button>
-    <button (click)="simulateStep()" [disabled]="simulationEnded">Step</button>
-  </div>
-
-  <canvas #canvas fxFlex="40"></canvas>
-
-  <div>
-    Statistikbereich
-    <!-- <div *ngFor="let statistic of statistics">
-      {{day | json}} : {{statistic | json}}
-    </div> -->
+  <div fxFlex="40" class="canvas-wrapper">
+    <canvas #canvas></canvas>
   </div>
 </div>
 
 <ng-template #labeledSlider let-name="name" let-valueRef="value" let-min="min" let-max="max" let-step="step" let-fCName="formControlName">
-  <div>
-    <label>{{name}}</label> {{valueRef}}
-    <input type="range" [min]="min" [max]="10" [step]="1" [formControlName]="fCName">
+  <div fxLayout="column" fxLayoutAlign="start stretch" [formGroup]="paramForm">
+    <div fxLayout="row" fxLayoutAlign="space-between stretch">
+      <label>
+        {{name}}
+      </label>
+      {{valueRef}}
+    </div>
+    <input type="range" [min]="min" [max]="max" [step]="step" [formControlName]="fCName">
   </div>
 </ng-template>
 
