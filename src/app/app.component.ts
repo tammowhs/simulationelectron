@@ -1,4 +1,3 @@
-import { Options } from '@angular-slider/ngx-slider';
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { interval } from 'rxjs';
@@ -37,12 +36,13 @@ export class AppComponent implements OnInit, AfterViewInit {
   public day: number;
 
   private readonly defaultSimulationParam: SimulationParameter = {
-    daysIncubated: 2,
+    daysIncubated: [2, 4],
     daysSymptomatic: 2,
     transmissionProbability: 0.35,
     deathRate: 0.15,
     movementRadius: 1,
     numberOfContacts: 4,
+    // test: [1, 3],
   };
 
   private simulationParam: SimulationParameter;
@@ -90,7 +90,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     for (let r = 0; r < this.metaParam.nRows; r++) {
       let row = [];
       for (let c = 0; c < this.metaParam.nCols; c++) {
-        let node = new GridNode(r, c);
+        let node = new GridNode(this.randomService, r, c);
         // node.immune = this.rng.random() < this.state.immunityFraction;
 
         row.push(node);
@@ -127,7 +127,8 @@ export class AppComponent implements OnInit, AfterViewInit {
       'transmissionProbability': [this.defaultSimulationParam.transmissionProbability, Validators.required],
       'deathRate': [this.defaultSimulationParam.deathRate, Validators.required],
       'movementRadius': [this.defaultSimulationParam.movementRadius, Validators.required],
-      'numberOfContacts': [this.defaultSimulationParam.numberOfContacts, Validators.required]
+      'numberOfContacts': [this.defaultSimulationParam.numberOfContacts, Validators.required],
+      // 'test': [this.defaultSimulationParam.test],
     });
 
     this.paramForm.valueChanges
@@ -137,6 +138,9 @@ export class AppComponent implements OnInit, AfterViewInit {
       .subscribe((formValue) => {
         console.log(formValue);
         this.simulationParam = { ...formValue };
+        // console.log(this.simulationParam.test);
+        // console.log(Math.min(...this.simulationParam.test));
+        // console.log(Math.max(...this.simulationParam.test));
         // this.simulationParam.daysIncubated = formValue.daysIncubated;
         // this.simulationParam.daysSymptomatic = formValue.daysSymptomatic;
         // this.simulationParam.transmissionProbability = formValue.transmissionProbability;
@@ -207,6 +211,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     // }
     // let overCapacity = this.state.hospitalCapacityPct > -1 && actualInfectedNodes > this.state.hospitalCapacityPct * (nRows*nCols);
 
+    // const effectiveDaysIncubating = this.randomService.randomInRange(this.simulationParam.daysIncubated[0], this.simulationParam.daysIncubated[1]);
     for (let r = 0; r < this.metaParam.nRows; r++) {
       for (let c = 0; c < this.metaParam.nCols; c++) {
         let node = this.grid[r][c];

@@ -1,4 +1,5 @@
 import { GridState } from "./grid-state.enum";
+import { RandomService } from "./random.service";
 
 export class GridNode {
   public rowIndex: number;
@@ -8,7 +9,7 @@ export class GridNode {
   private _nextState: GridState = GridState.Receptive;
   private daysInCurrentState: number = 0;
 
-  constructor(rowIndex: number, colIndex: number) {
+  constructor(private randomService: RandomService, rowIndex: number, colIndex: number) {
     this.rowIndex = rowIndex;
     this.colIndex = colIndex;
   }
@@ -58,7 +59,7 @@ export class GridNode {
   // }
 
   // allowDeaths: boolean, deathRate: number
-  evaluateNewState(daysIncubating: number, daysSymptomatic: number, deathRate: number) {
+  evaluateNewState(daysIncubating: [number, number], daysSymptomatic: number, deathRate: number) {
     if (this.nextState !== this.state) {
       this.daysInCurrentState = 0;
       this.state = this.nextState;
@@ -66,7 +67,9 @@ export class GridNode {
       this.daysInCurrentState++;
 
       if (this.isExposed) {
-        if (this.daysInCurrentState >= daysIncubating) {
+        const effectiveDaysIncubating = this.randomService.randomInRange(daysIncubating[0], daysIncubating[1]);
+        console.log(effectiveDaysIncubating);
+        if (this.daysInCurrentState >= effectiveDaysIncubating) {
           this.state = GridState.Infected;
           this.daysInCurrentState = 0;
         }

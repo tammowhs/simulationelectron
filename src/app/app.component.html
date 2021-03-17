@@ -4,8 +4,11 @@
       <div fxFlex="80" [formGroup]="paramForm">
         <h3>Parameter</h3>
 
-        <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Inkubationszeit', value: this.paramForm.value.daysIncubated, sliderOptions:{floor: 1, ceil: 10, step: 1, showSelectionBar: true}, formControlName: 'daysIncubated'}">
+        <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Inkubationszeit', value: this.paramForm.value.daysIncubated, sliderOptions:{floor: 1, ceil: 10, step: 1}, formControlName: 'daysIncubated'}">
         </ng-container>
+
+        <!-- <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Test', value: this.paramForm.value.test, sliderOptions:{floor: 1, ceil: 10, step: 1}, formControlName: 'test'}">
+        </ng-container> -->
 
         <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Infektionszeit', value: this.paramForm.value.daysSymptomatic, sliderOptions:{floor: 1, ceil: 10, step: 1, showSelectionBar: true}, formControlName: 'daysSymptomatic'}">
         </ng-container>
