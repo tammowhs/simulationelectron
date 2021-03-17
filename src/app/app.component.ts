@@ -1,3 +1,4 @@
+import { Options } from '@angular-slider/ngx-slider';
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { interval } from 'rxjs';
@@ -25,13 +26,13 @@ export class AppComponent implements OnInit, AfterViewInit {
     nRows: 69,
     nCols: 69,
     nodeSize: 10,
-    stepsPerSecond: 20,
+    stepsPerSecond: 5,
   }
 
   private grid: GridNode[][] = [];
   public statistics: Statistic[];
 
-  private timerRunning: boolean;
+  public timerRunning: boolean;
   public simulationEnded: boolean;
   public day: number;
 
@@ -135,12 +136,13 @@ export class AppComponent implements OnInit, AfterViewInit {
       )
       .subscribe((formValue) => {
         console.log(formValue);
-        this.simulationParam.daysIncubated = formValue.daysIncubated;
-        this.simulationParam.daysSymptomatic = formValue.daysSymptomatic;
-        this.simulationParam.transmissionProbability = formValue.transmissionProbability;
-        this.simulationParam.deathRate = formValue.deathRate;
-        this.simulationParam.movementRadius = formValue.movementRadius;
-        this.simulationParam.numberOfContacts = formValue.numberOfContacts;
+        this.simulationParam = { ...formValue };
+        // this.simulationParam.daysIncubated = formValue.daysIncubated;
+        // this.simulationParam.daysSymptomatic = formValue.daysSymptomatic;
+        // this.simulationParam.transmissionProbability = formValue.transmissionProbability;
+        // this.simulationParam.deathRate = formValue.deathRate;
+        // this.simulationParam.movementRadius = formValue.movementRadius;
+        // this.simulationParam.numberOfContacts = formValue.numberOfContacts;
       });
   }
 
