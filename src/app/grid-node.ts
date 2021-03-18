@@ -1,5 +1,5 @@
-import { GridState } from "./grid-state.enum";
-import { RandomService } from "./random.service";
+import { GridState } from './grid-state.enum';
+import { RandomService } from './random.service';
 
 export class GridNode {
   public rowIndex: number;
@@ -7,7 +7,7 @@ export class GridNode {
 
   private _state: GridState = GridState.Receptive;
   private _nextState: GridState = GridState.Receptive;
-  private daysInCurrentState: number = 0;
+  private daysInCurrentState = 0;
 
   // private isolating: boolean = false;
 

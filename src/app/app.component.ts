@@ -83,9 +83,9 @@ export class AppComponent implements OnInit, AfterViewInit {
   private initGrid() {
     this.grid = [];
     for (let r = 0; r < this.metaParam.nRows; r++) {
-      let row = [];
+      const row = [];
       for (let c = 0; c < this.metaParam.nCols; c++) {
-        let node = new GridNode(this.randomService, r, c);
+        const node = new GridNode(this.randomService, r, c);
         // node.immune = this.rng.random() < this.state.immunityFraction;
 
         row.push(node);
@@ -115,17 +115,17 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   private initForms() {
     this.paramForm = this.formBuilder.group({
-      'daysIncubated': [this.defaultSimulationParam.daysIncubated, Validators.required],
-      'daysSymptomatic': [this.defaultSimulationParam.daysSymptomatic, Validators.required],
-      'isolationRateSymptomatic': [this.defaultSimulationParam.isolationRateSymptomatic, Validators.required],
-      'transmissionProbability': [this.defaultSimulationParam.transmissionProbability, Validators.required],
-      'deathRate': [this.defaultSimulationParam.deathRate, Validators.required],
-      'movementRadius': [this.defaultSimulationParam.movementRadius, Validators.required],
-      'numberOfContacts': [this.defaultSimulationParam.numberOfContacts, Validators.required],
+      daysIncubated: [this.defaultSimulationParam.daysIncubated, Validators.required],
+      daysSymptomatic: [this.defaultSimulationParam.daysSymptomatic, Validators.required],
+      isolationRateSymptomatic: [this.defaultSimulationParam.isolationRateSymptomatic, Validators.required],
+      transmissionProbability: [this.defaultSimulationParam.transmissionProbability, Validators.required],
+      deathRate: [this.defaultSimulationParam.deathRate, Validators.required],
+      movementRadius: [this.defaultSimulationParam.movementRadius, Validators.required],
+      numberOfContacts: [this.defaultSimulationParam.numberOfContacts, Validators.required],
     });
 
     this.metaForm = this.formBuilder.group({
-      'stepsPerSecond': [this.metaParam.stepsPerSecond, Validators.required],
+      stepsPerSecond: [this.metaParam.stepsPerSecond, Validators.required],
     });
 
     this.metaForm.valueChanges
@@ -140,7 +140,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   public toggleSimulationExecution() {
     if (this.simulationEnded) {
-      console.log("reset");
+      console.log('reset');
 
       this.initForms();
       this.initGrid();
@@ -160,7 +160,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
       this.draw();
     } else {
-      console.log("Toggling");
+      console.log('Toggling');
       this.timerRunning = !this.timerRunning;
     }
   }
@@ -171,7 +171,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     // Start day
     for (let r = 0; r < this.metaParam.nRows; r++) {
       for (let c = 0; c < this.metaParam.nCols; c++) {
-        let node = this.grid[r][c];
+        const node = this.grid[r][c];
         node.nextState = node.state;
       }
     }
@@ -179,7 +179,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     // Infect
     for (let r = 0; r < this.metaParam.nRows; r++) {
       for (let c = 0; c < this.metaParam.nCols; c++) {
-        let node = this.grid[r][c];
+        const node = this.grid[r][c];
         // if (this.props.showInteractions && this.isCenterNode(r, c) && node.canInfectOthers()) {
         //   centerNodeNeighborsToDisplay = this.maybeInfect(node, r, c, linkedNodes);
         // } else {
@@ -196,7 +196,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
     for (let r = 0; r < this.metaParam.nRows; r++) {
       for (let c = 0; c < this.metaParam.nCols; c++) {
-        let node = this.grid[r][c];
+        const node = this.grid[r][c];
         node.evaluateNewState(this.paramForm.value.daysIncubated, this.paramForm.value.daysSymptomatic, this.paramForm.value.deathRate);
       }
     }
@@ -206,7 +206,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     let currentlyDeceased = 0;
     for (let r = 0; r < this.metaParam.nRows; r++) {
       for (let c = 0; c < this.metaParam.nCols; c++) {
-        let node = this.grid[r][c];
+        const node = this.grid[r][c];
 
         if (node.isInfectious) {
           currentlyInfectious++;
@@ -255,14 +255,14 @@ export class AppComponent implements OnInit, AfterViewInit {
 
       // console.groupEnd();
 
-      for (let neighbor of contacts) {
+      for (const neighbor of contacts) {
         node.tryToInfect(neighbor, transmissionProb);
       }
     }
   }
 
   private findContacts(row: number, col: number, radius: number, countNodes: number): GridNode[] {
-    let contacts: GridNode[] = [];
+    const contacts: GridNode[] = [];
 
     if (radius === 0 || countNodes === 0) {
       return contacts;
@@ -287,7 +287,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   private findNeighbors(r: number, c: number): GridNode[] {
-    let neighbors: GridNode[] = [];
+    const neighbors: GridNode[] = [];
 
     // Just the four cardinal neighbors
     if (r > 0) {
@@ -318,15 +318,15 @@ export class AppComponent implements OnInit, AfterViewInit {
 
     for (let r = 0; r < this.metaParam.nRows; r++) {
       for (let c = 0; c < this.metaParam.nCols; c++) {
-        let node = this.grid[r][c];
+        const node = this.grid[r][c];
         this.drawCell(r, c, node);
       }
     }
   }
 
   private drawCell(r: number, c: number, node: GridNode) {
-    let y = r * this.metaParam.nodeSize;
-    let x = c * this.metaParam.nodeSize;
+    const y = r * this.metaParam.nodeSize;
+    const x = c * this.metaParam.nodeSize;
 
     if (node.isExposed) {
       this.context.fillStyle = GridStateColor.Exposed;
@@ -348,7 +348,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       this.context.fillStyle = GridStateColor.Receptive;
     }
 
-    let gap = 1;
+    const gap = 1;
     // if (this.nodeSize < 5 || this.nodeSize < this.props.nodeSize) {
     //   gap = 0;
     // }
