@@ -1,8 +1,7 @@
-import { Options } from '@angular-slider/ngx-slider';
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { BehaviorSubject, interval, Observable, Subject } from 'rxjs';
-import { debounceTime, filter, map, switchMap, takeWhile } from 'rxjs/operators';
+import { BehaviorSubject, interval } from 'rxjs';
+import { debounceTime, filter, switchMap, takeWhile } from 'rxjs/operators';
 import { GridNode } from './grid-node';
 import { GridState, GridStateColor } from './grid-state.enum';
 import { MetaParameter } from './meta-parameter';
@@ -22,13 +21,6 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   private context: CanvasRenderingContext2D;
 
-  private metaParam: MetaParameter = {
-    nRows: 69,
-    nCols: 69,
-    nodeSize: 10,
-    stepsPerSecond: 5,
-  }
-
   private grid: GridNode[][] = [];
   public statistics: Statistic[];
 
@@ -39,16 +31,22 @@ export class AppComponent implements OnInit, AfterViewInit {
   private readonly defaultSimulationParam: SimulationParameter = {
     daysIncubated: [2, 4],
     daysSymptomatic: 2,
+    isolationRateSymptomatic: 0.3,
     transmissionProbability: 0.35,
     deathRate: 0.15,
     movementRadius: 1,
     numberOfContacts: 4,
   };
-
   paramForm: FormGroup;
 
+  private readonly metaParam: MetaParameter = {
+    nRows: 69,
+    nCols: 69,
+    nodeSize: 10,
+    stepsPerSecond: 5,
+  };
   metaForm: FormGroup;
-  intervalPeriod$ = new BehaviorSubject<number>(1000 / this.metaParam.stepsPerSecond);
+  intervalPeriod = new BehaviorSubject<number>(1000 / this.metaParam.stepsPerSecond);
 
   constructor(
     private randomService: RandomService,
@@ -64,15 +62,13 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.simulationEnded = false;
     this.day = 0;
 
+    this.statistics = [{ infectious: 1, recovered: 0, deceased: 0 }];
+
     this.initInterval();
 
     // const canvas = this.canvasRef.nativeElement;
     // canvas.width = this.nodeSize * this.nCols;
     // canvas.height = this.nodeSize * this.nRows;
-
-
-
-    this.statistics = [{ infectious: 1, recovered: 0, deceased: 0 }];
   }
 
   ngAfterViewInit() {
@@ -107,7 +103,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   private initInterval() {
 
-    this.intervalPeriod$.pipe(
+    this.intervalPeriod.pipe(
       switchMap(period => interval(period)),
       filter(() => this.timerRunning),
       takeWhile(() => !this.simulationEnded),
@@ -121,6 +117,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.paramForm = this.formBuilder.group({
       'daysIncubated': [this.defaultSimulationParam.daysIncubated, Validators.required],
       'daysSymptomatic': [this.defaultSimulationParam.daysSymptomatic, Validators.required],
+      'isolationRateSymptomatic': [this.defaultSimulationParam.isolationRateSymptomatic, Validators.required],
       'transmissionProbability': [this.defaultSimulationParam.transmissionProbability, Validators.required],
       'deathRate': [this.defaultSimulationParam.deathRate, Validators.required],
       'movementRadius': [this.defaultSimulationParam.movementRadius, Validators.required],
@@ -136,7 +133,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         debounceTime(200),
       )
       .subscribe(formValue => {
-        this.intervalPeriod$.next(1000 / formValue.stepsPerSecond);
+        this.intervalPeriod.next(1000 / formValue.stepsPerSecond);
       });
 
   }
@@ -153,7 +150,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
       this.timerRunning = false;
       this.simulationEnded = false;
-      this.day = 1;
+      this.day = 0;
 
       this.statistics = [{ infectious: 1, recovered: 0, deceased: 0 }];
 
@@ -240,7 +237,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   private tryToInfect(node: GridNode, r: number, c: number) {
     let contacts: GridNode[] = [];
-    if (node.isInfectious) {
+    if (node.isExposed || node.isInfected) {
 
       contacts = this.findContacts(r, c, this.paramForm.value.movementRadius, this.paramForm.value.numberOfContacts);
 
@@ -248,8 +245,18 @@ export class AppComponent implements OnInit, AfterViewInit {
 
       // contacts = this.findNeighbors(r, c);
 
+      let transmissionProb = this.paramForm.value.transmissionProbability;
+      // console.group('test');
+      // console.log(transmissionProb);
+      if (node.isInfected) {
+        transmissionProb *= (1 - this.paramForm.value.isolationRateSymptomatic);
+      }
+      // console.log(transmissionProb);
+
+      // console.groupEnd();
+
       for (let neighbor of contacts) {
-        node.tryToInfect(neighbor, this.paramForm.value.transmissionProbability);
+        node.tryToInfect(neighbor, transmissionProb);
       }
     }
   }
@@ -317,7 +324,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
   }
 
-  drawCell(r: number, c: number, node: GridNode) {
+  private drawCell(r: number, c: number, node: GridNode) {
     let y = r * this.metaParam.nodeSize;
     let x = c * this.metaParam.nodeSize;
 

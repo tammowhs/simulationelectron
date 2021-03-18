@@ -1,7 +1,7 @@
 <div fxLayout="row" fxLayoutAlign="start stretch">
   <div fxFlex="50" fxLayout="column" fxLayoutAlign="start stretch">
     <div fxLayout="row" fxLayoutAlign="start stretch">
-      <div fxFlex="80" [formGroup]="paramForm">
+      <div fxFlex="80" class="p-16" [formGroup]="paramForm">
         <h3>Parameter</h3>
 
         <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Inkubationszeit', value: this.paramForm.value.daysIncubated, sliderOptions:{floor: 1, ceil: 10, step: 1}, formControlName: 'daysIncubated'}">
@@ -11,6 +11,9 @@
         </ng-container> -->
 
         <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Infektionszeit', value: this.paramForm.value.daysSymptomatic, sliderOptions:{floor: 1, ceil: 10, step: 1, showSelectionBar: true}, formControlName: 'daysSymptomatic'}">
+        </ng-container>
+
+        <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Isolationsrate Symptomanten', value: this.paramForm.value.isolationRateSymptomatic, sliderOptions:{floor: 0, ceil: 1, step: 0.05, showSelectionBar: true}, formControlName: 'isolationRateSymptomatic'}">
         </ng-container>
 
         <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Übertragungsrate', value: this.paramForm.value.transmissionProbability, sliderOptions:{floor: 0, ceil: 1, step: 0.05, showSelectionBar: true}, formControlName: 'transmissionProbability'}">
@@ -27,7 +30,7 @@
 
       </div>
 
-      <div fxFlex="20" fxLayout="column" fxLayoutAlign="end stretch" [formGroup]="metaForm">
+      <div fxFlex="20" fxLayout="column" fxLayoutAlign="end stretch" class="p-16" [formGroup]="metaForm">
         <!-- <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Test', value: this.paramForm.value.movementRadius, sliderOptions:{floor: 0, ceil: 10, step: 1, showSelectionBar: true, vertical: true}, formControlName: 'movementRadius'}">
         </ng-container> -->
         Geschwindigkeit {{this.metaForm.value.stepsPerSecond}}
@@ -38,7 +41,7 @@
       </div>
     </div>
 
-    <div fxFlex="60">
+    <div fxFlex="60" class="p-16">
       <h3>Statistik</h3>
       Tag: {{day | json}}
       <!-- <div *ngFor="let statistic of statistics">

@@ -1,17 +1,11 @@
-.content {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  justify-content: center;
-  align-items: center;
-  margin: 82px auto 32px;
-  // padding: 0 16px;
-  max-width: 960px;
-}
-
 .canvas-wrapper {
   justify-content: center;
   align-items: center;
+  padding: 16px;
+}
+
+.p-16 {
+  padding: 16px;
 }
 
 ::ng-deep {
