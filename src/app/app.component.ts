@@ -1,7 +1,8 @@
+import { Options } from '@angular-slider/ngx-slider';
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { interval } from 'rxjs';
-import { debounceTime, filter, takeWhile } from 'rxjs/operators';
+import { BehaviorSubject, interval, Observable, Subject } from 'rxjs';
+import { debounceTime, filter, map, switchMap, takeWhile } from 'rxjs/operators';
 import { GridNode } from './grid-node';
 import { GridState, GridStateColor } from './grid-state.enum';
 import { MetaParameter } from './meta-parameter';
@@ -42,19 +43,20 @@ export class AppComponent implements OnInit, AfterViewInit {
     deathRate: 0.15,
     movementRadius: 1,
     numberOfContacts: 4,
-    // test: [1, 3],
   };
 
   private simulationParam: SimulationParameter;
-  public paramForm: FormGroup;
+  paramForm: FormGroup;
 
+  metaForm: FormGroup;
+  intervalPeriod$ = new BehaviorSubject<number>(1000 / this.metaParam.stepsPerSecond);
 
   constructor(
     private randomService: RandomService,
     private formBuilder: FormBuilder) { }
 
   ngOnInit() {
-    this.initForm();
+    this.initForms();
     this.simulationParam = { ...this.paramForm.value };
 
     this.initGrid();
@@ -107,19 +109,17 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   private initInterval() {
 
-    const period = 1000 / this.metaParam.stepsPerSecond;
-    interval(period)
-      .pipe(
-        filter(() => this.timerRunning),
-        takeWhile(() => !this.simulationEnded),
-      )
-      .subscribe(val => {
-        // console.log('tick', val);
-        this.simulateStep();
-      });
+    this.intervalPeriod$.pipe(
+      switchMap(period => interval(period)),
+      filter(() => this.timerRunning),
+      takeWhile(() => !this.simulationEnded),
+    ).subscribe(val => {
+      // console.log('interval', val);
+      this.simulateStep();
+    });
   }
 
-  private initForm() {
+  private initForms() {
     this.paramForm = this.formBuilder.group({
       'daysIncubated': [this.defaultSimulationParam.daysIncubated, Validators.required],
       'daysSymptomatic': [this.defaultSimulationParam.daysSymptomatic, Validators.required],
@@ -127,33 +127,36 @@ export class AppComponent implements OnInit, AfterViewInit {
       'deathRate': [this.defaultSimulationParam.deathRate, Validators.required],
       'movementRadius': [this.defaultSimulationParam.movementRadius, Validators.required],
       'numberOfContacts': [this.defaultSimulationParam.numberOfContacts, Validators.required],
-      // 'test': [this.defaultSimulationParam.test],
     });
 
     this.paramForm.valueChanges
       .pipe(
-        debounceTime(200)
+        debounceTime(100)
       )
       .subscribe((formValue) => {
         console.log(formValue);
         this.simulationParam = { ...formValue };
-        // console.log(this.simulationParam.test);
-        // console.log(Math.min(...this.simulationParam.test));
-        // console.log(Math.max(...this.simulationParam.test));
-        // this.simulationParam.daysIncubated = formValue.daysIncubated;
-        // this.simulationParam.daysSymptomatic = formValue.daysSymptomatic;
-        // this.simulationParam.transmissionProbability = formValue.transmissionProbability;
-        // this.simulationParam.deathRate = formValue.deathRate;
-        // this.simulationParam.movementRadius = formValue.movementRadius;
-        // this.simulationParam.numberOfContacts = formValue.numberOfContacts;
       });
+
+    this.metaForm = this.formBuilder.group({
+      'stepsPerSecond': [this.metaParam.stepsPerSecond, Validators.required],
+    });
+
+    this.metaForm.valueChanges
+      .pipe(
+        debounceTime(200),
+      )
+      .subscribe(formValue => {
+        this.intervalPeriod$.next(1000 / formValue.stepsPerSecond);
+      });
+
   }
 
   public toggleSimulationExecution() {
     if (this.simulationEnded) {
       console.log("reset");
 
-      this.initForm();
+      this.initForms();
       this.simulationParam = { ...this.paramForm.value };
       this.initGrid();
       this.initPatientZero();
@@ -245,12 +248,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       deceased: currentlyDeceased,
     });
 
-    console.log(this.statistics[this.statistics.length - 1]);
-
-    // this.state.capacityPerDay.push(this.state.hospitalCapacityPct * this.props.gridRows * this.props.gridRows);
-    // this.state.deadPerDay.push(actualDeadNodes);
-    // this.state.infectedPerDay.push(actualInfectedNodes);
-    // this.state.recoveredPerDay.push(actualRecoveredNodes);
+    // console.log(this.statistics[this.statistics.length - 1]);
 
     // this.state.centerNodeNeighborsToDisplay = centerNodeNeighborsToDisplay;
 
@@ -368,13 +366,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     if (node.isReceptive) {
       // Node is susceptible
       this.context.fillStyle = GridStateColor.Receptive;
-
-      // if (node.specialDegree !== null) {
-      //   // should be somewhere between 4 and 8
-      //   Utils.assert(node.specialDegree >= 4 && node.specialDegree <= 8, "node.specialDegree should be between 4 and 8; was: " + node.specialDegree);
-      //   let intensity = (node.specialDegree - 4) / 4.0;
-      //   context.fillStyle = Colors.hex(Colors.blend(Colors.makeHex(Grid.SUSCEPTIBLE_COLOR), Colors.makeHex('#BBB'), intensity))
-      // }
     }
 
     let gap = 1;
@@ -411,24 +402,4 @@ export class AppComponent implements OnInit, AfterViewInit {
     //   // }
     // }
   }
-
-  //   private drawGrid () {
-  //     let squareSizePx = 28;
-  //     let paddingLeft = squareSizePx;
-  //     let paddingTop = squareSizePx;
-  //     let paddingRight = squareSizePx;
-  //     let paddingBottom = squareSizePx;
-
-  //     this.context.strokeStyle = 'lightgrey';
-  //     this.context.beginPath();
-  //     for (var x = paddingLeft; x <= this.width - paddingRight; x += squareSizePx) {
-  //        this.context.moveTo(x, paddingTop)
-  //        this.context.lineTo(x, this.height - paddingBottom)
-  //     }
-  //     for (var y = paddingTop; y <= this.height - paddingBottom; y += squareSizePx) {
-  //        this.context.moveTo(paddingLeft, y)
-  //        this.context.lineTo(this.width - paddingRight, y)
-  //     }
-  //     this.context.stroke()
-  //  }
 }

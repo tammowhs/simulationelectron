@@ -68,7 +68,6 @@ export class GridNode {
 
       if (this.isExposed) {
         const effectiveDaysIncubating = this.randomService.randomInRange(daysIncubating[0], daysIncubating[1]);
-        console.log(effectiveDaysIncubating);
         if (this.daysInCurrentState >= effectiveDaysIncubating) {
           this.state = GridState.Infected;
           this.daysInCurrentState = 0;

@@ -27,7 +27,11 @@
 
       </div>
 
-      <div fxFlex="20" fxLayout="column" fxLayoutAlign="end stretch">
+      <div fxFlex="20" fxLayout="column" fxLayoutAlign="end stretch" [formGroup]="metaForm">
+        <!-- <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Test', value: this.paramForm.value.movementRadius, sliderOptions:{floor: 0, ceil: 10, step: 1, showSelectionBar: true, vertical: true}, formControlName: 'movementRadius'}">
+        </ng-container> -->
+        Geschwindigkeit {{this.metaForm.value.stepsPerSecond}}
+        <ngx-slider [options]="{ floor: 1, ceil: 20, step: 1, showSelectionBar: true }" [formControlName]="'stepsPerSecond'"></ngx-slider>
         <button *ngIf="!simulationEnded" (click)="toggleSimulationExecution()">Play/Pause</button>
         <button *ngIf="simulationEnded" (click)="toggleSimulationExecution()">Reset</button>
         <button (click)="simulateStep()" [disabled]="simulationEnded || timerRunning">Step</button>
