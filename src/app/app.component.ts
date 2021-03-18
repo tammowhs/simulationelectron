@@ -138,37 +138,35 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   }
 
+  public reset() {
+    console.log('reset');
+
+    this.initForms();
+    this.initGrid();
+    this.initPatientZero();
+
+    this.initInterval();
+
+    this.timerRunning = false;
+    this.simulationEnded = false;
+    this.day = 0;
+
+    this.statistics = [{ infectious: 1, recovered: 0, deceased: 0 }];
+
+    // console.log('formValue', this.paramForm.value);
+    // console.log('defSimParam', this.defaultSimulationParam);
+
+    this.draw();
+  }
+
   public toggleSimulationExecution() {
-    if (this.simulationEnded) {
-      console.log('reset');
-
-      this.initForms();
-      this.initGrid();
-      this.initPatientZero();
-
-      this.initInterval();
-
-      this.timerRunning = false;
-      this.simulationEnded = false;
-      this.day = 0;
-
-      this.statistics = [{ infectious: 1, recovered: 0, deceased: 0 }];
-
-      // console.log('formValue', this.paramForm.value);
-      // console.log('defSimParam', this.defaultSimulationParam);
-
-
-      this.draw();
-    } else {
-      console.log('Toggling');
-      this.timerRunning = !this.timerRunning;
-    }
+    console.log('Toggling');
+    this.timerRunning = !this.timerRunning;
   }
 
   public simulateStep() {
     this.day++;
 
-    // Start day
     for (let r = 0; r < this.metaParam.nRows; r++) {
       for (let c = 0; c < this.metaParam.nCols; c++) {
         const node = this.grid[r][c];
@@ -194,19 +192,13 @@ export class AppComponent implements OnInit, AfterViewInit {
     // }
     // let overCapacity = this.state.hospitalCapacityPct > -1 && actualInfectedNodes > this.state.hospitalCapacityPct * (nRows*nCols);
 
-    for (let r = 0; r < this.metaParam.nRows; r++) {
-      for (let c = 0; c < this.metaParam.nCols; c++) {
-        const node = this.grid[r][c];
-        node.evaluateNewState(this.paramForm.value.daysIncubated, this.paramForm.value.daysSymptomatic, this.paramForm.value.deathRate);
-      }
-    }
-
     let currentlyInfectious = 0;
     let currentlyRecovered = 0;
     let currentlyDeceased = 0;
     for (let r = 0; r < this.metaParam.nRows; r++) {
       for (let c = 0; c < this.metaParam.nCols; c++) {
         const node = this.grid[r][c];
+        node.evaluateNewState(this.paramForm.value.daysIncubated, this.paramForm.value.daysSymptomatic, this.paramForm.value.deathRate, this.paramForm.value.isolationRateSymptomatic);
 
         if (node.isInfectious) {
           currentlyInfectious++;
@@ -222,13 +214,33 @@ export class AppComponent implements OnInit, AfterViewInit {
       }
     }
 
+
+    // // let currentlyInfectious = 0;
+    // // let currentlyRecovered = 0;
+    // // let currentlyDeceased = 0;
+    // for (let r = 0; r < this.metaParam.nRows; r++) {
+    //   for (let c = 0; c < this.metaParam.nCols; c++) {
+    //     const node = this.grid[r][c];
+
+    //     if (node.isInfectious) {
+    //       currentlyInfectious++;
+    //     }
+
+    //     if (node.isRecovered) {
+    //       currentlyRecovered++;
+    //     }
+
+    //     if (node.isDeceased) {
+    //       currentlyDeceased++;
+    //     }
+    //   }
+    // }
+
     this.statistics.push({
       infectious: currentlyInfectious,
       recovered: currentlyRecovered,
       deceased: currentlyDeceased,
     });
-
-    // console.log(this.statistics[this.statistics.length - 1]);
 
     this.draw();
 
@@ -236,27 +248,18 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   private tryToInfect(node: GridNode, r: number, c: number) {
-    let contacts: GridNode[] = [];
-    if (node.isExposed || node.isInfected) {
-
-      contacts = this.findContacts(r, c, this.paramForm.value.movementRadius, this.paramForm.value.numberOfContacts);
-
-      // console.log(contacts.map(node => `row: ${node.rowIndex}, col: ${node.colIndex}, nextState: ${node.nextState}`));
+    if (node.isInfectious) {
+      const contacts: GridNode[] = this.findContacts(r, c, this.paramForm.value.movementRadius, this.paramForm.value.numberOfContacts);
 
       // contacts = this.findNeighbors(r, c);
 
       let transmissionProb = this.paramForm.value.transmissionProbability;
-      // console.group('test');
-      // console.log(transmissionProb);
-      if (node.isInfected) {
-        transmissionProb *= (1 - this.paramForm.value.isolationRateSymptomatic);
+      if (node.isIsolating) {
+        transmissionProb *= 0.1;
       }
-      // console.log(transmissionProb);
 
-      // console.groupEnd();
-
-      for (const neighbor of contacts) {
-        node.tryToInfect(neighbor, transmissionProb);
+      for (const contact of contacts) {
+        node.tryToInfect(contact, transmissionProb);
       }
     }
   }
@@ -272,15 +275,12 @@ export class AppComponent implements OnInit, AfterViewInit {
       const rowDeviation = this.randomService.randomInRange(radius * -1, radius);
       const colDeviation = this.randomService.randomInRange(radius * -1, radius);
 
-      if (rowDeviation === 0 && colDeviation === 0) {
+      if ((rowDeviation === 0 && colDeviation === 0) || !this.isNodeInGrid(row + rowDeviation, col + colDeviation)) {
         i--;
         continue;
       }
-
-      if (this.isNodeInGrid(row + rowDeviation, col + colDeviation)) {
-        const node = this.grid[row + rowDeviation][col + colDeviation];
-        contacts.push(node);
-      }
+      const node = this.grid[row + rowDeviation][col + colDeviation];
+      contacts.push(node);
     }
 
     return contacts;

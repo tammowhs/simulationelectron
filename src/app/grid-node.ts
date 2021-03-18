@@ -9,7 +9,7 @@ export class GridNode {
   private _nextState: GridState = GridState.Receptive;
   private daysInCurrentState = 0;
 
-  // private isolating: boolean = false;
+  private isolating: boolean = false;
 
   constructor(private randomService: RandomService, rowIndex: number, colIndex: number) {
     this.rowIndex = rowIndex;
@@ -56,12 +56,16 @@ export class GridNode {
     return this._state === GridState.Exposed || this._state === GridState.Infected;
   }
 
+  get isIsolating() {
+    return this.isolating;
+  }
+
   // startDay() {
   //   this._nextState = this._state;
   // }
 
   // allowDeaths: boolean, deathRate: number
-  evaluateNewState(daysIncubating: [number, number], daysSymptomatic: number, deathRate: number) {
+  evaluateNewState(daysIncubating: [number, number], daysSymptomatic: number, deathRate: number, isolationRate: number) {
     if (this.nextState !== this.state) {
       this.daysInCurrentState = 0;
       this.state = this.nextState;
@@ -73,6 +77,9 @@ export class GridNode {
         if (this.daysInCurrentState >= effectiveDaysIncubating) {
           this.state = GridState.Infected;
           this.daysInCurrentState = 0;
+          if (this.randomService.random() < isolationRate) {
+            this.isolating = true;
+          }
         }
       }
 
@@ -82,7 +89,7 @@ export class GridNode {
           //   deathRate = deathRate * 2;
           // }
 
-          if (Math.random() < deathRate) {
+          if (this.randomService.random() < deathRate) {
             this.state = GridState.Deceased;
           } else {
             this.state = GridState.Recovered;
@@ -94,9 +101,9 @@ export class GridNode {
     }
   }
 
-  tryToInfect(neighbor: GridNode, transProb: number) {
-    if (neighbor.isReceptive && Math.random() < transProb) {
-      neighbor.nextState = GridState.Exposed;
+  tryToInfect(contact: GridNode, transProb: number) {
+    if (contact.isReceptive && this.randomService.random() < transProb) {
+      contact.nextState = GridState.Exposed;
     }
   }
 }
