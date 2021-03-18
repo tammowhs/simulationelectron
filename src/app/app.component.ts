@@ -45,7 +45,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     numberOfContacts: 4,
   };
 
-  private simulationParam: SimulationParameter;
   paramForm: FormGroup;
 
   metaForm: FormGroup;
@@ -57,7 +56,6 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     this.initForms();
-    this.simulationParam = { ...this.paramForm.value };
 
     this.initGrid();
     this.initPatientZero();
@@ -129,15 +127,6 @@ export class AppComponent implements OnInit, AfterViewInit {
       'numberOfContacts': [this.defaultSimulationParam.numberOfContacts, Validators.required],
     });
 
-    this.paramForm.valueChanges
-      .pipe(
-        debounceTime(100)
-      )
-      .subscribe((formValue) => {
-        console.log(formValue);
-        this.simulationParam = { ...formValue };
-      });
-
     this.metaForm = this.formBuilder.group({
       'stepsPerSecond': [this.metaParam.stepsPerSecond, Validators.required],
     });
@@ -157,7 +146,6 @@ export class AppComponent implements OnInit, AfterViewInit {
       console.log("reset");
 
       this.initForms();
-      this.simulationParam = { ...this.paramForm.value };
       this.initGrid();
       this.initPatientZero();
 
@@ -169,9 +157,8 @@ export class AppComponent implements OnInit, AfterViewInit {
 
       this.statistics = [{ infectious: 1, recovered: 0, deceased: 0 }];
 
-      console.log('formValue', this.paramForm.value);
-      console.log('simParam', this.simulationParam);
-      console.log('defSimParam', this.defaultSimulationParam);
+      // console.log('formValue', this.paramForm.value);
+      // console.log('defSimParam', this.defaultSimulationParam);
 
 
       this.draw();
@@ -183,8 +170,6 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   public simulateStep() {
     this.day++;
-    // let actualRemovedCells = 0;
-    // let linkedNodes: Set<GridNode> = new Set();
 
     // Start day
     for (let r = 0; r < this.metaParam.nRows; r++) {
@@ -195,7 +180,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
 
     // Infect
-    // let centerNodeNeighborsToDisplay = [];
     for (let r = 0; r < this.metaParam.nRows; r++) {
       for (let c = 0; c < this.metaParam.nCols; c++) {
         let node = this.grid[r][c];
@@ -213,11 +197,10 @@ export class AppComponent implements OnInit, AfterViewInit {
     // }
     // let overCapacity = this.state.hospitalCapacityPct > -1 && actualInfectedNodes > this.state.hospitalCapacityPct * (nRows*nCols);
 
-    // const effectiveDaysIncubating = this.randomService.randomInRange(this.simulationParam.daysIncubated[0], this.simulationParam.daysIncubated[1]);
     for (let r = 0; r < this.metaParam.nRows; r++) {
       for (let c = 0; c < this.metaParam.nCols; c++) {
         let node = this.grid[r][c];
-        node.evaluateNewState(this.simulationParam.daysIncubated, this.simulationParam.daysSymptomatic, this.simulationParam.deathRate);
+        node.evaluateNewState(this.paramForm.value.daysIncubated, this.paramForm.value.daysSymptomatic, this.paramForm.value.deathRate);
       }
     }
 
@@ -250,14 +233,6 @@ export class AppComponent implements OnInit, AfterViewInit {
 
     // console.log(this.statistics[this.statistics.length - 1]);
 
-    // this.state.centerNodeNeighborsToDisplay = centerNodeNeighborsToDisplay;
-
-    // Update the number of active nodes, and the playing bit if necessary
-    // this.setState({
-    //   numActiveNodes: actualInfectedNodes,
-    //   playing: this.state.playing && actualInfectedNodes !== 0,
-    // });
-
     this.draw();
 
     this.simulationEnded = currentlyInfectious === 0;
@@ -267,15 +242,14 @@ export class AppComponent implements OnInit, AfterViewInit {
     let contacts: GridNode[] = [];
     if (node.isInfectious) {
 
-      contacts = this.findContacts(r, c, this.simulationParam.movementRadius, this.simulationParam.numberOfContacts);
+      contacts = this.findContacts(r, c, this.paramForm.value.movementRadius, this.paramForm.value.numberOfContacts);
 
       // console.log(contacts.map(node => `row: ${node.rowIndex}, col: ${node.colIndex}, nextState: ${node.nextState}`));
 
       // contacts = this.findNeighbors(r, c);
 
-      // transProb = Math.pow(transProb, 3);
       for (let neighbor of contacts) {
-        node.tryToInfect(neighbor, this.simulationParam.transmissionProbability);
+        node.tryToInfect(neighbor, this.paramForm.value.transmissionProbability);
       }
     }
   }
@@ -364,7 +338,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
 
     if (node.isReceptive) {
-      // Node is susceptible
       this.context.fillStyle = GridStateColor.Receptive;
     }
 
