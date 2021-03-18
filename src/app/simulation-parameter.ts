@@ -6,5 +6,6 @@ export class SimulationParameter {
   deathRate: number;
   movementRadius: number;
   numberOfContacts: number;
+  reInfectionRate: number;
   // test: [number, number];
 }

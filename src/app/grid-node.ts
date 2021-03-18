@@ -96,13 +96,15 @@ export class GridNode {
           }
 
           this.daysInCurrentState = 0;
+          this.isolating = false;
         }
       }
     }
   }
 
-  tryToInfect(contact: GridNode, transProb: number) {
-    if (contact.isReceptive && this.randomService.random() < transProb) {
+  tryToInfect(contact: GridNode, transProb: number, reInfectionRate: number) {
+    if (contact.isReceptive && this.randomService.random() < transProb
+      || contact.isRecovered && this.randomService.random() < reInfectionRate) {
       contact.nextState = GridState.Exposed;
     }
   }

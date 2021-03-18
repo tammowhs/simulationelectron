@@ -33,9 +33,10 @@ export class AppComponent implements OnInit, AfterViewInit {
     daysSymptomatic: 2,
     isolationRateSymptomatic: 0.3,
     transmissionProbability: 0.35,
-    deathRate: 0.15,
+    deathRate: 0.1,
     movementRadius: 1,
     numberOfContacts: 4,
+    reInfectionRate: 0.05,
   };
   paramForm: FormGroup;
 
@@ -47,6 +48,10 @@ export class AppComponent implements OnInit, AfterViewInit {
   };
   metaForm: FormGroup;
   intervalPeriod = new BehaviorSubject<number>(1000 / this.metaParam.stepsPerSecond);
+
+  private get currentParams() {
+    return this.paramForm.value as SimulationParameter;
+  }
 
   constructor(
     private randomService: RandomService,
@@ -122,6 +127,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       deathRate: [this.defaultSimulationParam.deathRate, Validators.required],
       movementRadius: [this.defaultSimulationParam.movementRadius, Validators.required],
       numberOfContacts: [this.defaultSimulationParam.numberOfContacts, Validators.required],
+      reInfectionRate: [this.defaultSimulationParam.reInfectionRate, Validators.required],
     });
 
     this.metaForm = this.formBuilder.group({
@@ -153,7 +159,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
     this.statistics = [{ infectious: 1, recovered: 0, deceased: 0 }];
 
-    // console.log('formValue', this.paramForm.value);
+    // console.log('formValue', this.currentParams);
     // console.log('defSimParam', this.defaultSimulationParam);
 
     this.draw();
@@ -198,7 +204,10 @@ export class AppComponent implements OnInit, AfterViewInit {
     for (let r = 0; r < this.metaParam.nRows; r++) {
       for (let c = 0; c < this.metaParam.nCols; c++) {
         const node = this.grid[r][c];
-        node.evaluateNewState(this.paramForm.value.daysIncubated, this.paramForm.value.daysSymptomatic, this.paramForm.value.deathRate, this.paramForm.value.isolationRateSymptomatic);
+        node.evaluateNewState(this.currentParams.daysIncubated,
+          this.currentParams.daysSymptomatic,
+          this.currentParams.deathRate,
+          this.currentParams.isolationRateSymptomatic);
 
         if (node.isInfectious) {
           currentlyInfectious++;
@@ -249,17 +258,17 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   private tryToInfect(node: GridNode, r: number, c: number) {
     if (node.isInfectious) {
-      const contacts: GridNode[] = this.findContacts(r, c, this.paramForm.value.movementRadius, this.paramForm.value.numberOfContacts);
+      const contacts: GridNode[] = this.findContacts(r, c, this.currentParams.movementRadius, this.currentParams.numberOfContacts);
 
       // contacts = this.findNeighbors(r, c);
 
-      let transmissionProb = this.paramForm.value.transmissionProbability;
+      let transmissionProb = this.currentParams.transmissionProbability;
       if (node.isIsolating) {
         transmissionProb *= 0.1;
       }
 
       for (const contact of contacts) {
-        node.tryToInfect(contact, transmissionProb);
+        node.tryToInfect(contact, transmissionProb, this.currentParams.reInfectionRate);
       }
     }
   }
