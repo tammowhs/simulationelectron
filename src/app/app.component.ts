@@ -46,8 +46,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   };
 
   private simulationParam: SimulationParameter;
-
-  paramForm: FormGroup;
+  public paramForm: FormGroup;
 
 
   constructor(
