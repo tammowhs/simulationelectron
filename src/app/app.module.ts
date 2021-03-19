@@ -4,6 +4,8 @@ import { NgModule } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
+import { NgxChartsModule } from '@swimlane/ngx-charts';
+import { ChartsModule } from 'ng2-charts';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -20,6 +22,8 @@ import { AppComponent } from './app.component';
     FormsModule,
     ReactiveFormsModule,
     NgxSliderModule,
+    NgxChartsModule,
+    ChartsModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

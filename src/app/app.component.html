@@ -47,9 +47,19 @@
     <div fxFlex="60" class="p-16">
       <h3>Statistik</h3>
       Tag: {{day | json}}
-      <div *ngFor="let statistic of statistics">
+      <!-- <div *ngFor="let statistic of statistics">
         {{statistic | json}}
-      </div>
+      </div> -->
+      <!-- <ngx-charts-area-chart-stacked [results]="ngxStatistics" [scheme]="colorScheme">
+      </ngx-charts-area-chart-stacked> -->
+      <canvas baseChart
+              [chartType]="'line'"
+              [labels]="lineChartLabels"
+              [datasets]="lineChartData"
+              [options]="lineChartOptions"
+              [colors]="lineChartColors"
+              [legend]="true">
+      </canvas>
     </div>
   </div>
 
