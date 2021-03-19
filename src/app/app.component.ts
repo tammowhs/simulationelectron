@@ -50,7 +50,16 @@ export class AppComponent implements OnInit, AfterViewInit {
   intervalPeriod = new BehaviorSubject<number>(1000 / this.metaParam.stepsPerSecond);
 
   private get currentParams() {
-    return this.paramForm.value as SimulationParameter;
+    return {
+      daysIncubated: this.paramForm.value.daysIncubated,
+      daysSymptomatic: this.paramForm.value.daysSymptomatic,
+      isolationRateSymptomatic: this.paramForm.value.isolationRateSymptomatic,
+      transmissionProbability: this.paramForm.value.transmissionProbability,
+      deathRate: this.paramForm.value.deathRate,
+      movementRadius: this.paramForm.value.movementRadius,
+      numberOfContacts: this.paramForm.value.numberOfContacts,
+      reInfectionRate: this.paramForm.value.reInfectionRate,
+    } as SimulationParameter;
   }
 
   constructor(
@@ -67,7 +76,11 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.simulationEnded = false;
     this.day = 0;
 
-    this.statistics = [{ infectious: 1, recovered: 0, deceased: 0 }];
+    this.statistics = [{
+      day: 0,
+      infectious: 1, recovered: 0, deceased: 0, healthy: this.metaParam.nCols * this.metaParam.nRows - 1,
+      deltaInfectious: 0, deltaRecovered: 0, deltaDeceased: 0, healthyDelta: 0
+    }];
 
     this.initInterval();
 
@@ -107,15 +120,15 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   private initInterval() {
-
-    this.intervalPeriod.pipe(
-      switchMap(period => interval(period)),
-      filter(() => this.timerRunning),
-      takeWhile(() => !this.simulationEnded),
-    ).subscribe(val => {
-      // console.log('interval', val);
-      this.simulateStep();
-    });
+    this.intervalPeriod
+      .pipe(
+        switchMap(period => interval(period)),
+        filter(() => this.timerRunning),
+        takeWhile(() => !this.simulationEnded),
+      ).subscribe(val => {
+        // console.log('interval', val);
+        this.simulateStep();
+      });
   }
 
   private initForms() {
@@ -157,7 +170,11 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.simulationEnded = false;
     this.day = 0;
 
-    this.statistics = [{ infectious: 1, recovered: 0, deceased: 0 }];
+    this.statistics = [{
+      day: 0,
+      infectious: 1, recovered: 0, deceased: 0, healthy: this.metaParam.nCols * this.metaParam.nRows - 1,
+      deltaInfectious: 0, deltaRecovered: 0, deltaDeceased: 0, healthyDelta: 0
+    }];
 
     // console.log('formValue', this.currentParams);
     // console.log('defSimParam', this.defaultSimulationParam);
@@ -201,6 +218,8 @@ export class AppComponent implements OnInit, AfterViewInit {
     let currentlyInfectious = 0;
     let currentlyRecovered = 0;
     let currentlyDeceased = 0;
+    let currentlyReceptive = 0;
+
     for (let r = 0; r < this.metaParam.nRows; r++) {
       for (let c = 0; c < this.metaParam.nCols; c++) {
         const node = this.grid[r][c];
@@ -220,35 +239,26 @@ export class AppComponent implements OnInit, AfterViewInit {
         if (node.isDeceased) {
           currentlyDeceased++;
         }
+
+        if (node.isReceptive) {
+          currentlyReceptive++;
+        }
       }
     }
 
-
-    // // let currentlyInfectious = 0;
-    // // let currentlyRecovered = 0;
-    // // let currentlyDeceased = 0;
-    // for (let r = 0; r < this.metaParam.nRows; r++) {
-    //   for (let c = 0; c < this.metaParam.nCols; c++) {
-    //     const node = this.grid[r][c];
-
-    //     if (node.isInfectious) {
-    //       currentlyInfectious++;
-    //     }
-
-    //     if (node.isRecovered) {
-    //       currentlyRecovered++;
-    //     }
-
-    //     if (node.isDeceased) {
-    //       currentlyDeceased++;
-    //     }
-    //   }
-    // }
-
+    // statistic
+    const lastStatisticEntry = this.statistics[this.statistics.length - 1];
     this.statistics.push({
+      day: this.day,
       infectious: currentlyInfectious,
       recovered: currentlyRecovered,
       deceased: currentlyDeceased,
+      healthy: currentlyReceptive,
+      deltaInfectious: currentlyInfectious - lastStatisticEntry.infectious,
+      deltaRecovered: currentlyRecovered - lastStatisticEntry.recovered,
+      deltaDeceased: currentlyDeceased - lastStatisticEntry.deceased,
+      healthyDelta: currentlyReceptive - lastStatisticEntry.healthy
+    });
     });
 
     this.draw();
