@@ -1,7 +1,9 @@
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { interval } from 'rxjs';
-import { debounceTime, filter, takeWhile } from 'rxjs/operators';
+import { ChartDataSets, ChartOptions } from 'chart.js';
+import { Color, Label } from 'ng2-charts';
+import { BehaviorSubject, interval } from 'rxjs';
+import { debounceTime, filter, switchMap, takeWhile } from 'rxjs/operators';
 import { GridNode } from './grid-node';
 import { GridState, GridStateColor } from './grid-state.enum';
 import { MetaParameter } from './meta-parameter';
@@ -9,6 +11,16 @@ import { RandomService } from './random.service';
 import { SimulationParameter } from './simulation-parameter';
 import { Statistic } from './statistic';
 
+
+export class NameValuePair {
+  name: string;
+  value: number;
+}
+
+export class NgxStatistic {
+  name: string;
+  series: NameValuePair[];
+}
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -21,56 +33,137 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   private context: CanvasRenderingContext2D;
 
-  private metaParam: MetaParameter = {
-    nRows: 69,
-    nCols: 69,
-    nodeSize: 10,
-    stepsPerSecond: 2,
-  }
-
   private grid: GridNode[][] = [];
   public statistics: Statistic[];
 
-  private timerRunning: boolean = false;
-  public simulationEnded: boolean = false;
-  public day: number = 1;
+  public timerRunning: boolean;
+  public simulationEnded: boolean;
+  public day: number;
 
   private readonly defaultSimulationParam: SimulationParameter = {
-    daysIncubated: 2,
+    daysIncubated: [2, 4],
     daysSymptomatic: 2,
-    transmissionProbability: 0.33,
-    deathRate: 0.15,
+    isolationRateSymptomatic: 0.3,
+    transmissionProbability: 0.35,
+    deathRate: 0.1,
     movementRadius: 1,
     numberOfContacts: 4,
+    reInfectionRate: 0.05,
   };
-
-  private simulationParam: SimulationParameter;
-
   paramForm: FormGroup;
 
+  private readonly metaParam: MetaParameter = {
+    nRows: 69,
+    nCols: 69,
+    nodeSize: 10,
+    stepsPerSecond: 5,
+  };
+  metaForm: FormGroup;
+  intervalPeriod = new BehaviorSubject<number>(1000 / this.metaParam.stepsPerSecond);
+
+
+
+  colorScheme = {
+    domain: [GridStateColor.Infected, GridStateColor.Recovered, GridStateColor.Deceased, GridStateColor.Receptive]
+  };
+
+  healthy: NgxStatistic = {
+    name: 'healthy',
+    series: [],
+  };
+
+  deceased: NgxStatistic = {
+    name: 'deceased',
+    series: [],
+  };
+
+  recovered: NgxStatistic = {
+    name: 'recovered',
+    series: [],
+  };
+
+  infectious: NgxStatistic = {
+    name: 'infectious',
+    series: [],
+  };
+
+  get ngxStatistics(): NgxStatistic[] {
+    return [this.infectious, this.recovered, this.deceased, this.healthy];
+  }
+
+
+
+  public lineChartData: ChartDataSets[] = [
+    { data: [1, 2, 3, 5, 8, 13, 21], label: 'Infektiös', stack: 'a' },
+    { data: [1, 2, 3, 5, 8, 13, 21], label: 'Geheilt', stack: 'a' },
+    { data: [1, 2, 3, 5, 8, 13, 21], label: 'Verstorben', stack: 'a' },
+    { data: [97, 94, 91, 85, 76, 61, 37], label: 'Gesund', stack: 'a' },
+  ];
+
+  public lineChartLabels: Label[] = [
+    '1', '2', '3', '4', '5', '6', '7'
+  ];
+
+  public lineChartOptions: ChartOptions = {
+    responsive: true,
+    scales: {
+      yAxes: [
+        {
+          stacked: true
+        }
+      ]
+    }
+  };
+  public lineChartColors: Color[] = [
+    {
+      backgroundColor: 'rgba(255,0,0,0.3)'
+    },
+    {
+      backgroundColor: 'rgba(0,0,255,0.3)'
+    },
+    {
+      backgroundColor: 'rgba(0,0,0,0.3)'
+    }
+  ];
+
+  private get currentParams() {
+    return {
+      daysIncubated: this.paramForm.value.daysIncubated,
+      daysSymptomatic: this.paramForm.value.daysSymptomatic,
+      isolationRateSymptomatic: this.paramForm.value.isolationRateSymptomatic,
+      transmissionProbability: this.paramForm.value.transmissionProbability,
+      deathRate: this.paramForm.value.deathRate,
+      movementRadius: this.paramForm.value.movementRadius,
+      numberOfContacts: this.paramForm.value.numberOfContacts,
+      reInfectionRate: this.paramForm.value.reInfectionRate,
+    } as SimulationParameter;
+  }
 
   constructor(
     private randomService: RandomService,
     private formBuilder: FormBuilder) { }
 
   ngOnInit() {
-    this.initForm();
-    this.simulationParam = { ...this.paramForm.value };
+    this.initForms();
 
     this.initGrid();
     this.initPatientZero();
+
+    this.timerRunning = false;
+    this.simulationEnded = false;
+    this.day = 0;
+
+    this.statistics = [{
+      day: 0,
+      infectious: 1, recovered: 0, deceased: 0, healthy: this.metaParam.nCols * this.metaParam.nRows - 1,
+      deltaInfectious: 0, deltaRecovered: 0, deltaDeceased: 0, healthyDelta: 0
+    }];
 
     this.initInterval();
 
     // const canvas = this.canvasRef.nativeElement;
     // canvas.width = this.nodeSize * this.nCols;
     // canvas.height = this.nodeSize * this.nRows;
-
-    this.timerRunning = false;
-    this.simulationEnded = false;
-    this.day = 1;
-
-    this.statistics = [{ infectious: 1, recovered: 0, deceased: 0 }];
   }
 
   ngAfterViewInit() {
@@ -85,9 +178,9 @@ export class AppComponent implements OnInit, AfterViewInit {
   private initGrid() {
     this.grid = [];
     for (let r = 0; r < this.metaParam.nRows; r++) {
-      let row = [];
+      const row = [];
       for (let c = 0; c < this.metaParam.nCols; c++) {
-        let node = new GridNode(r, c);
+        const node = new GridNode(this.randomService, r, c);
         // node.immune = this.rng.random() < this.state.immunityFraction;
 
         row.push(node);
@@ -104,91 +197,87 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   private initInterval() {
-
-    const period = 1000 / this.metaParam.stepsPerSecond;
-    interval(period)
+    this.intervalPeriod
       .pipe(
+        switchMap(period => interval(period)),
         filter(() => this.timerRunning),
         takeWhile(() => !this.simulationEnded),
-      )
-      .subscribe(val => {
-        // console.log('tick', val);
+      ).subscribe(val => {
+        // console.log('interval', val);
         this.simulateStep();
       });
   }
 
-  private initForm() {
+  private initForms() {
     this.paramForm = this.formBuilder.group({
-      'daysIncubated': [this.defaultSimulationParam.daysIncubated, Validators.required],
-      'daysSymptomatic': [this.defaultSimulationParam.daysSymptomatic, Validators.required],
-      'transmissionProbability': [this.defaultSimulationParam.transmissionProbability, Validators.required],
-      'deathRate': [this.defaultSimulationParam.deathRate, Validators.required],
-      'movementRadius': [this.defaultSimulationParam.movementRadius, Validators.required],
-      'numberOfContacts': [this.defaultSimulationParam.numberOfContacts, Validators.required]
+      daysIncubated: [this.defaultSimulationParam.daysIncubated, Validators.required],
+      daysSymptomatic: [this.defaultSimulationParam.daysSymptomatic, Validators.required],
+      isolationRateSymptomatic: [this.defaultSimulationParam.isolationRateSymptomatic, Validators.required],
+      transmissionProbability: [this.defaultSimulationParam.transmissionProbability, Validators.required],
+      deathRate: [this.defaultSimulationParam.deathRate, Validators.required],
+      movementRadius: [this.defaultSimulationParam.movementRadius, Validators.required],
+      numberOfContacts: [this.defaultSimulationParam.numberOfContacts, Validators.required],
+      reInfectionRate: [this.defaultSimulationParam.reInfectionRate, Validators.required],
     });
 
-    this.paramForm.valueChanges
+    this.metaForm = this.formBuilder.group({
+      stepsPerSecond: [this.metaParam.stepsPerSecond, Validators.required],
+    });
+
+    this.metaForm.valueChanges
       .pipe(
-        debounceTime(200)
+        debounceTime(200),
       )
-      .subscribe((formValue) => {
-        console.log(formValue);
-        this.simulationParam.daysIncubated = formValue.daysIncubated;
-        this.simulationParam.daysSymptomatic = formValue.daysSymptomatic;
-        this.simulationParam.transmissionProbability = formValue.transmissionProbability;
-        this.simulationParam.deathRate = formValue.deathRate;
-        this.simulationParam.movementRadius = formValue.movementRadius;
-        this.simulationParam.numberOfContacts = formValue.numberOfContacts;
+      .subscribe(formValue => {
+        this.intervalPeriod.next(1000 / formValue.stepsPerSecond);
       });
+
+  }
+
+  public reset() {
+    console.log('reset');
+
+    this.initForms();
+    this.initGrid();
+    this.initPatientZero();
+
+    this.initInterval();
+
+    this.timerRunning = false;
+    this.simulationEnded = false;
+    this.day = 0;
+
+    this.statistics = [{
+      day: 0,
+      infectious: 1, recovered: 0, deceased: 0, healthy: this.metaParam.nCols * this.metaParam.nRows - 1,
+      deltaInfectious: 0, deltaRecovered: 0, deltaDeceased: 0, healthyDelta: 0
+    }];
+
+    // console.log('formValue', this.currentParams);
+    // console.log('defSimParam', this.defaultSimulationParam);
+
+    this.draw();
   }
 
   public toggleSimulationExecution() {
-    if (this.simulationEnded) {
-      console.log("reset");
-
-      this.initForm();
-      this.simulationParam = { ...this.paramForm.value };
-      this.initGrid();
-      this.initPatientZero();
-
-      this.initInterval();
-
-      this.timerRunning = false;
-      this.simulationEnded = false;
-      this.day = 1;
-
-      this.statistics = [{ infectious: 1, recovered: 0, deceased: 0 }];
-
-      console.log('formValue', this.paramForm.value);
-      console.log('simParam', this.simulationParam);
-      console.log('defSimParam', this.defaultSimulationParam);
-
-
-      this.draw();
-    } else {
-      console.log("Toggling");
-      this.timerRunning = !this.timerRunning;
-    }
+    console.log('Toggling');
+    this.timerRunning = !this.timerRunning;
   }
 
   public simulateStep() {
     this.day++;
-    // let actualRemovedCells = 0;
-    // let linkedNodes: Set<GridNode> = new Set();
 
-    // Start day
     for (let r = 0; r < this.metaParam.nRows; r++) {
       for (let c = 0; c < this.metaParam.nCols; c++) {
-        let node = this.grid[r][c];
+        const node = this.grid[r][c];
         node.nextState = node.state;
       }
     }
 
     // Infect
-    // let centerNodeNeighborsToDisplay = [];
     for (let r = 0; r < this.metaParam.nRows; r++) {
       for (let c = 0; c < this.metaParam.nCols; c++) {
-        let node = this.grid[r][c];
+        const node = this.grid[r][c];
         // if (this.props.showInteractions && this.isCenterNode(r, c) && node.canInfectOthers()) {
         //   centerNodeNeighborsToDisplay = this.maybeInfect(node, r, c, linkedNodes);
         // } else {
@@ -203,19 +292,18 @@ export class AppComponent implements OnInit, AfterViewInit {
     // }
     // let overCapacity = this.state.hospitalCapacityPct > -1 && actualInfectedNodes > this.state.hospitalCapacityPct * (nRows*nCols);
 
-    for (let r = 0; r < this.metaParam.nRows; r++) {
-      for (let c = 0; c < this.metaParam.nCols; c++) {
-        let node = this.grid[r][c];
-        node.evaluateNewState(this.simulationParam.daysIncubated, this.simulationParam.daysSymptomatic, this.simulationParam.deathRate);
-      }
-    }
-
     let currentlyInfectious = 0;
     let currentlyRecovered = 0;
     let currentlyDeceased = 0;
+    let currentlyReceptive = 0;
+
     for (let r = 0; r < this.metaParam.nRows; r++) {
       for (let c = 0; c < this.metaParam.nCols; c++) {
-        let node = this.grid[r][c];
+        const node = this.grid[r][c];
+        node.evaluateNewState(this.currentParams.daysIncubated,
+          this.currentParams.daysSymptomatic,
+          this.currentParams.deathRate,
+          this.currentParams.isolationRateSymptomatic);
 
         if (node.isInfectious) {
           currentlyInfectious++;
@@ -228,29 +316,45 @@ export class AppComponent implements OnInit, AfterViewInit {
         if (node.isDeceased) {
           currentlyDeceased++;
         }
+
+        if (node.isReceptive) {
+          currentlyReceptive++;
+        }
       }
     }
 
+    // statistic
+    const lastStatisticEntry = this.statistics[this.statistics.length - 1];
     this.statistics.push({
+      day: this.day,
       infectious: currentlyInfectious,
       recovered: currentlyRecovered,
       deceased: currentlyDeceased,
+      healthy: currentlyReceptive,
+      deltaInfectious: currentlyInfectious - lastStatisticEntry.infectious,
+      deltaRecovered: currentlyRecovered - lastStatisticEntry.recovered,
+      deltaDeceased: currentlyDeceased - lastStatisticEntry.deceased,
+      healthyDelta: currentlyReceptive - lastStatisticEntry.healthy
     });
 
-    console.log(this.statistics[this.statistics.length - 1]);
-
-    // this.state.capacityPerDay.push(this.state.hospitalCapacityPct * this.props.gridRows * this.props.gridRows);
-    // this.state.deadPerDay.push(actualDeadNodes);
-    // this.state.infectedPerDay.push(actualInfectedNodes);
-    // this.state.recoveredPerDay.push(actualRecoveredNodes);
-
-    // this.state.centerNodeNeighborsToDisplay = centerNodeNeighborsToDisplay;
-
-    // Update the number of active nodes, and the playing bit if necessary
-    // this.setState({
-    //   numActiveNodes: actualInfectedNodes,
-    //   playing: this.state.playing && actualInfectedNodes !== 0,
-    // });
+    // statisticForNgx
+    const dayAsString = this.day.toString();
+    this.deceased.series.push({
+      name: dayAsString,
+      value: currentlyDeceased,
+    });
+    this.recovered.series.push({
+      name: dayAsString,
+      value: currentlyRecovered,
+    });
+    this.infectious.series.push({
+      name: dayAsString,
+      value: currentlyInfectious,
+    });
+    this.healthy.series.push({
+      name: dayAsString,
+      value: currentlyReceptive,
+    });
 
     this.draw();
 
@@ -258,45 +362,46 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   private tryToInfect(node: GridNode, r: number, c: number) {
-    let contacts: GridNode[] = [];
     if (node.isInfectious) {
-
-      contacts = this.findContacts(r, c, this.simulationParam.movementRadius, this.simulationParam.numberOfContacts);
-
-      // console.log(contacts.map(node => `row: ${node.rowIndex}, col: ${node.colIndex}, nextState: ${node.nextState}`));
+      const contacts: GridNode[] = this.findContacts(r, c, this.currentParams.movementRadius, this.currentParams.numberOfContacts);
 
       // contacts = this.findNeighbors(r, c);
 
-      // transProb = Math.pow(transProb, 3);
-      for (let neighbor of contacts) {
-        node.tryToInfect(neighbor, this.simulationParam.transmissionProbability);
+      let transmissionProb = this.currentParams.transmissionProbability;
+      if (node.isIsolating) {
+        transmissionProb *= 0.1;
+      }
+
+      for (const contact of contacts) {
+        node.tryToInfect(contact, transmissionProb, this.currentParams.reInfectionRate);
       }
     }
   }
 
   private findContacts(row: number, col: number, radius: number, countNodes: number): GridNode[] {
-    let contacts: GridNode[] = [];
+    const contacts: GridNode[] = [];
+
+    if (radius === 0 || countNodes === 0) {
+      return contacts;
+    }
 
     for (let i = 0; i < countNodes; i++) {
       const rowDeviation = this.randomService.randomInRange(radius * -1, radius);
       const colDeviation = this.randomService.randomInRange(radius * -1, radius);
 
-      if (rowDeviation === 0 && colDeviation === 0) {
+      if ((rowDeviation === 0 && colDeviation === 0) || !this.isNodeInGrid(row + rowDeviation, col + colDeviation)) {
         i--;
         continue;
       }
-
-      if (this.isNodeInGrid(row + rowDeviation, col + colDeviation)) {
-        const node = this.grid[row + rowDeviation][col + colDeviation];
-        contacts.push(node);
-      }
+      const node = this.grid[row + rowDeviation][col + colDeviation];
+      contacts.push(node);
     }
 
     return contacts;
   }
 
   private findNeighbors(r: number, c: number): GridNode[] {
-    let neighbors: GridNode[] = [];
+    const neighbors: GridNode[] = [];
 
     // Just the four cardinal neighbors
     if (r > 0) {
@@ -327,15 +432,15 @@ export class AppComponent implements OnInit, AfterViewInit {
 
     for (let r = 0; r < this.metaParam.nRows; r++) {
       for (let c = 0; c < this.metaParam.nCols; c++) {
-        let node = this.grid[r][c];
+        const node = this.grid[r][c];
         this.drawCell(r, c, node);
       }
     }
   }
 
-  drawCell(r: number, c: number, node: GridNode) {
-    let y = r * this.metaParam.nodeSize;
-    let x = c * this.metaParam.nodeSize;
+  private drawCell(r: number, c: number, node: GridNode) {
+    const y = r * this.metaParam.nodeSize;
+    const x = c * this.metaParam.nodeSize;
 
     if (node.isExposed) {
       this.context.fillStyle = GridStateColor.Exposed;
@@ -354,18 +459,10 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
 
     if (node.isReceptive) {
-      // Node is susceptible
       this.context.fillStyle = GridStateColor.Receptive;
-
-      // if (node.specialDegree !== null) {
-      //   // should be somewhere between 4 and 8
-      //   Utils.assert(node.specialDegree >= 4 && node.specialDegree <= 8, "node.specialDegree should be between 4 and 8; was: " + node.specialDegree);
-      //   let intensity = (node.specialDegree - 4) / 4.0;
-      //   context.fillStyle = Colors.hex(Colors.blend(Colors.makeHex(Grid.SUSCEPTIBLE_COLOR), Colors.makeHex('#BBB'), intensity))
-      // }
     }
 
-    let gap = 1;
+    const gap = 1;
     // if (this.nodeSize < 5 || this.nodeSize < this.props.nodeSize) {
     //   gap = 0;
     // }
@@ -399,24 +496,4 @@ export class AppComponent implements OnInit, AfterViewInit {
     //   // }
     // }
   }
-
-  //   private drawGrid () {
-  //     let squareSizePx = 28;
-  //     let paddingLeft = squareSizePx;
-  //     let paddingTop = squareSizePx;
-  //     let paddingRight = squareSizePx;
-  //     let paddingBottom = squareSizePx;
-
-  //     this.context.strokeStyle = 'lightgrey';
-  //     this.context.beginPath();
-  //     for (var x = paddingLeft; x <= this.width - paddingRight; x += squareSizePx) {
-  //        this.context.moveTo(x, paddingTop)
-  //        this.context.lineTo(x, this.height - paddingBottom)
-  //     }
-  //     for (var y = paddingTop; y <= this.height - paddingBottom; y += squareSizePx) {
-  //        this.context.moveTo(paddingLeft, y)
-  //        this.context.lineTo(this.width - paddingRight, y)
-  //     }
-  //     this.context.stroke()
-  //  }
 }
