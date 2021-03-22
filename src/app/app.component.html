@@ -1,5 +1,6 @@
-<div fxLayout="row" fxLayoutAlign="start stretch">
+<div fxLayout="row" fxLayoutAlign="start stretch" class="inherit-height">
   <div fxFlex="60" fxLayout="column" fxLayoutAlign="start stretch">
+
     <div #parameter fxFlex="40" class="p-16">
       <mat-card>
         <mat-card-header>
@@ -41,14 +42,14 @@
       </mat-card>
     </div>
 
-    <div #statistic fxFlex="auto" class="p-ex-top-16">
+    <div #statistic fxFlex="60" class="p-ex-top-16">
       <mat-card>
         <mat-card-header>
           <mat-card-title>Statistik</mat-card-title>
           <mat-card-subtitle>Tag: {{day | json}}</mat-card-subtitle>
         </mat-card-header>
         <mat-card-content>
-          <canvas baseChart
+          <canvas baseChart class="statistic"
                   [chartType]="'line'"
                   [labels]="lineChartLabels"
                   [datasets]="lineChartData"
@@ -61,7 +62,7 @@
     </div>
   </div>
 
-  <div #map fxFlex="auto" class="canvas-wrapper">
+  <div #map fxFlex="40" class="canvas-wrapper">
     <mat-card>
       <mat-card-content>
         <canvas #canvas></canvas>
