@@ -58,17 +58,20 @@ export class AppComponent implements OnInit, AfterViewInit {
   };
 
   public lineChartData: ChartDataSets[] = [
-    { data: [1, 2, 3, 5, 8, 13, 21], label: 'Infektiös', stack: 'a' },
-    { data: [1, 2, 3, 5, 8, 13, 21], label: 'Geheilt', stack: 'a' },
-    { data: [1, 2, 3, 5, 8, 13, 21], label: 'Verstorben', stack: 'a' },
-    { data: [97, 94, 91, 85, 76, 61, 37], label: 'Gesund', stack: 'a' },
+    { data: [], label: 'Infektiös', stack: 'a' },
+    { data: [], label: 'Geheilt', stack: 'a' },
+    { data: [], label: 'Verstorben', stack: 'a' },
+    { data: [], label: 'Gesund', stack: 'a' },
   ];
 
   public lineChartLabels: Label[] = [
-    '1', '2', '3', '4', '5', '6', '7'
+    // '1', '2', '3', '4', '5', '6', '7'
   ];
 
   public lineChartOptions: ChartOptions = {
+    animation: {
+      duration: 0 //performance
+    },
     responsive: true,
     scales: {
       yAxes: [
@@ -301,6 +304,13 @@ export class AppComponent implements OnInit, AfterViewInit {
       healthyDelta: currentlyReceptive - lastStatisticEntry.healthy
     });
 
+    // statisticForNg2Chart
+    // this.lineChartData[0].data = this.statistics.map(stat => stat.infectious);
+    this.lineChartData[0].data?.push(currentlyInfectious);
+    this.lineChartData[1].data?.push(currentlyRecovered);
+    this.lineChartData[2].data?.push(currentlyDeceased);
+    this.lineChartData[3].data?.push(currentlyReceptive);
+    this.lineChartLabels.push(this.day.toString());
 
     this.draw();
 
