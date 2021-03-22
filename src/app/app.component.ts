@@ -11,16 +11,6 @@ import { RandomService } from './random.service';
 import { SimulationParameter } from './simulation-parameter';
 import { Statistic } from './statistic';
 
-
-export class NameValuePair {
-  name: string;
-  value: number;
-}
-
-export class NgxStatistic {
-  name: string;
-  series: NameValuePair[];
-}
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -66,32 +56,6 @@ export class AppComponent implements OnInit, AfterViewInit {
   colorScheme = {
     domain: [GridStateColor.Infected, GridStateColor.Recovered, GridStateColor.Deceased, GridStateColor.Receptive]
   };
-
-  healthy: NgxStatistic = {
-    name: 'healthy',
-    series: [],
-  };
-
-  deceased: NgxStatistic = {
-    name: 'deceased',
-    series: [],
-  };
-
-  recovered: NgxStatistic = {
-    name: 'recovered',
-    series: [],
-  };
-
-  infectious: NgxStatistic = {
-    name: 'infectious',
-    series: [],
-  };
-
-  get ngxStatistics(): NgxStatistic[] {
-    return [this.infectious, this.recovered, this.deceased, this.healthy];
-  }
-
-
 
   public lineChartData: ChartDataSets[] = [
     { data: [1, 2, 3, 5, 8, 13, 21], label: 'Infektiös', stack: 'a' },
@@ -337,24 +301,6 @@ export class AppComponent implements OnInit, AfterViewInit {
       healthyDelta: currentlyReceptive - lastStatisticEntry.healthy
     });
 
-    // statisticForNgx
-    const dayAsString = this.day.toString();
-    this.deceased.series.push({
-      name: dayAsString,
-      value: currentlyDeceased,
-    });
-    this.recovered.series.push({
-      name: dayAsString,
-      value: currentlyRecovered,
-    });
-    this.infectious.series.push({
-      name: dayAsString,
-      value: currentlyInfectious,
-    });
-    this.healthy.series.push({
-      name: dayAsString,
-      value: currentlyReceptive,
-    });
 
     this.draw();
 
