@@ -44,9 +44,18 @@
         </ng-container> -->
         Geschwindigkeit {{this.metaForm.value.stepsPerSecond}}
         <ngx-slider [options]="{ floor: 1, ceil: 20, step: 1, showSelectionBar: true }" [formControlName]="'stepsPerSecond'"></ngx-slider>
-        <button *ngIf="!simulationEnded" (click)="toggleSimulationExecution()">Play/Pause</button>
-        <button *ngIf="simulationEnded" (click)="reset()">Reset</button>
-        <button (click)="simulateStep()" [disabled]="simulationEnded || timerRunning">Step</button>
+        <button mat-icon-button *ngIf="!simulationEnded && !timerRunning" (click)="toggleSimulationExecution()">
+          <mat-icon matTooltip="Play">play_circle_outline</mat-icon>
+        </button>
+        <button mat-icon-button *ngIf="!simulationEnded && timerRunning" (click)="toggleSimulationExecution()">
+          <mat-icon matTooltip="Pause">pause_circle_outline</mat-icon>
+        </button>
+        <button mat-icon-button *ngIf="simulationEnded" (click)="reset()">
+          <mat-icon matTooltip="Erneut starten">replay</mat-icon>
+        </button>
+        <button mat-icon-button (click)="simulateStep()" [disabled]="simulationEnded || timerRunning">
+          <mat-icon matTooltip="Einzelner Schritt">redo</mat-icon>
+        </button>
       </div>
     </div>
 
@@ -92,16 +101,15 @@
 </ng-template> -->
 
 <ng-template #labeledSlider let-name="name" let-valueRef="value" let-options="sliderOptions" let-sliderControlName="formControlName">
-  <div fxLayout="column" fxLayoutAlign="start stretch" [formGroup]="paramForm">
+  <div fxLayout="column" fxLayoutAlign="start stretch" [formGroup]="paramForm" style="padding-bottom: 12px;">
     <div fxLayout="row" fxLayoutAlign="space-between stretch">
       <label>
         {{name}}
+        <mat-icon matTooltip="Info about the parameter" [inline]="true">help_outline</mat-icon>
       </label>
-      <!-- | percent -->
+
       {{valueRef}}
     </div>
     <ngx-slider [options]="options" [formControlName]="sliderControlName"></ngx-slider>
   </div>
 </ng-template>
-
-<!-- <router-outlet></router-outlet> -->
