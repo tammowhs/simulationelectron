@@ -31,7 +31,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   public day: number;
 
   private readonly defaultSimulationParam: SimulationParameter = {
-    daysIncubated: [2, 4],
+    daysIncubated: 3,
     daysSymptomatic: 2,
     isolationRateSymptomatic: 0.3,
     transmissionProbability: 0.35,
@@ -40,7 +40,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     numberOfContacts: 4,
     reInfectionRate: 0.05,
   };
-  public paramForm: FormGroup;
 
   private readonly metaParam: MetaParameter = {
     nRows: 69,
@@ -91,18 +90,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
   ];
 
-  private get currentParams() {
-    return {
-      daysIncubated: this.paramForm.value.daysIncubated,
-      daysSymptomatic: this.paramForm.value.daysSymptomatic,
-      isolationRateSymptomatic: this.paramForm.value.isolationRateSymptomatic,
-      transmissionProbability: this.paramForm.value.transmissionProbability,
-      deathRate: this.paramForm.value.deathRate,
-      movementRadius: this.paramForm.value.movementRadius,
-      numberOfContacts: this.paramForm.value.numberOfContacts,
-      reInfectionRate: this.paramForm.value.reInfectionRate,
-    } as SimulationParameter;
-  }
+  public currentParams: SimulationParameter;
 
   constructor(
     private randomService: RandomService,
@@ -110,6 +98,8 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     this.initForms();
+
+    this.currentParams = { ...this.defaultSimulationParam };
 
     this.initGrid();
     this.initPatientZero();
@@ -170,16 +160,6 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   private initForms() {
-    this.paramForm = this.formBuilder.group({
-      daysIncubated: [this.defaultSimulationParam.daysIncubated, Validators.required],
-      daysSymptomatic: [this.defaultSimulationParam.daysSymptomatic, Validators.required],
-      isolationRateSymptomatic: [this.defaultSimulationParam.isolationRateSymptomatic, Validators.required],
-      transmissionProbability: [this.defaultSimulationParam.transmissionProbability, Validators.required],
-      deathRate: [this.defaultSimulationParam.deathRate, Validators.required],
-      movementRadius: [this.defaultSimulationParam.movementRadius, Validators.required],
-      numberOfContacts: [this.defaultSimulationParam.numberOfContacts, Validators.required],
-      reInfectionRate: [this.defaultSimulationParam.reInfectionRate, Validators.required],
-    });
 
     this.metaForm = this.formBuilder.group({
       stepsPerSecond: [this.metaParam.stepsPerSecond, Validators.required],
@@ -197,6 +177,8 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   public reset() {
     console.log('reset');
+
+    this.currentParams = { ...this.defaultSimulationParam };
 
     this.initForms();
     this.initGrid();

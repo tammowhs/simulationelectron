@@ -9,7 +9,7 @@ export class GridNode {
   private _nextState: GridState = GridState.Receptive;
   private daysInCurrentState = 0;
 
-  private isolating: boolean = false;
+  private isolating = false;
 
   constructor(private randomService: RandomService, rowIndex: number, colIndex: number) {
     this.rowIndex = rowIndex;
@@ -65,7 +65,7 @@ export class GridNode {
   // }
 
   // allowDeaths: boolean, deathRate: number
-  evaluateNewState(daysIncubating: [number, number], daysSymptomatic: number, deathRate: number, isolationRate: number) {
+  evaluateNewState(daysIncubating: number, daysSymptomatic: number, deathRate: number, isolationRate: number) {
     if (this.nextState !== this.state) {
       this.daysInCurrentState = 0;
       this.state = this.nextState;
@@ -73,8 +73,8 @@ export class GridNode {
       this.daysInCurrentState++;
 
       if (this.isExposed) {
-        const effectiveDaysIncubating = this.randomService.randomInRange(daysIncubating[0], daysIncubating[1]);
-        if (this.daysInCurrentState >= effectiveDaysIncubating) {
+        // const effectiveDaysIncubating = this.randomService.randomInRange(daysIncubating[0], daysIncubating[1]);
+        if (this.daysInCurrentState >= daysIncubating) {
           this.state = GridState.Infected;
           this.daysInCurrentState = 0;
           if (this.randomService.random() < isolationRate) {

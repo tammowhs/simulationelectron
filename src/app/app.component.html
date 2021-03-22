@@ -1,43 +1,47 @@
 <div fxLayout="row" fxLayoutAlign="start stretch">
   <div fxFlex="60" fxLayout="column" fxLayoutAlign="start stretch">
-    <div class="p-16">
+    <div #parameter fxFlex="40" class="p-16">
       <mat-card>
         <mat-card-header>
           <mat-card-title>Parameter</mat-card-title>
         </mat-card-header>
         <mat-card-content>
-          <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Inkubationszeit', tooltip: 'Anzahl Tage, die zwischen Ansteckung und ersten Symptome vergeht. Person ist bereits ansteckend.', value: this.paramForm.value.daysIncubated, sliderOptions:{floor: 1, ceil: 10, step: 1}, formControlName: 'daysIncubated'}">
-          </ng-container>
+          <div fxLayout="row" fxLayoutAlign="start stretch">
 
-          <!-- <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Test', value: this.paramForm.value.test, sliderOptions:{floor: 1, ceil: 10, step: 1}, formControlName: 'test'}">
-            </ng-container> -->
+            <div fxFlex=50>
+              <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Inkubationszeit', tooltip: 'Anzahl Tage, die zwischen Ansteckung und ersten Symptome vergeht. Person ist bereits ansteckend.', floor: 1, ceil: 10, step: 1, formControlName: 'daysIncubated'}">
+              </ng-container>
 
-          <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Infektionszeit', tooltip: 'Anzahl Tage, die zwischen ersten Symptomen und Ende der Infektion vergeht. Person ist weiterhin ansteckend, hat aber eine Chance sich zu Isolieren.', value: this.paramForm.value.daysSymptomatic, sliderOptions:{floor: 1, ceil: 10, step: 1, showSelectionBar: true}, formControlName: 'daysSymptomatic'}">
-          </ng-container>
+              <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Infektionszeit', tooltip: 'Anzahl Tage, die zwischen ersten Symptomen und Ende der Infektion vergeht. Person ist weiterhin ansteckend, hat aber eine Chance sich zu Isolieren.', floor: 1, ceil: 10, step: 1, formControlName: 'daysSymptomatic'}">
+              </ng-container>
 
-          <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Isolationsrate Symptomanten', tooltip: 'Anteil aktiv Infizierter, die sich in Isolation begeben. Isolierte haben nur noch ein Zehntel der allgemeinen Ansteckungswahrscheinlichkeit.', value: this.paramForm.value.isolationRateSymptomatic, sliderOptions:{floor: 0, ceil: 1, step: 0.05, showSelectionBar: true}, formControlName: 'isolationRateSymptomatic'}">
-          </ng-container>
+              <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Isolationsrate', tooltip: 'Anteil aktiv Infizierter, die sich in Isolation begeben. Isolierte haben nur noch ein Zehntel der allgemeinen Ansteckungswahrscheinlichkeit.', floor: 0, ceil: 1, step: 0.05, formControlName: 'isolationRateSymptomatic'}">
+              </ng-container>
 
-          <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Übertragungsrate', tooltip: 'Allgemeine Ansteckungswahrscheinlichkeit', value: this.paramForm.value.transmissionProbability, sliderOptions:{floor: 0, ceil: 1, step: 0.05, showSelectionBar: true}, formControlName: 'transmissionProbability'}">
-          </ng-container>
+              <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Übertragungsrate', tooltip: 'Allgemeine Ansteckungswahrscheinlichkeit', floor: 0, ceil: 1, step: 0.05, formControlName: 'transmissionProbability'}">
+              </ng-container>
+            </div>
 
-          <ng-container *ngTemplateOutlet="labeledSlider; context:{name: '2. Infektion', tooltip: 'Ansteckungswahrscheinlichkeit für eine Neuinfektion, nachdem man bereits erstmals geheilt war.', value: this.paramForm.value.reInfectionRate, sliderOptions:{floor: 0, ceil: 1, step: 0.05, showSelectionBar: true}, formControlName: 'reInfectionRate'}">
-          </ng-container>
+            <div fxFlex=50>
+              <ng-container *ngTemplateOutlet="labeledSlider; context:{name: '2. Infektion', tooltip: 'Ansteckungswahrscheinlichkeit für eine Neuinfektion, nachdem man bereits erstmals geheilt war.', floor: 0, ceil: 1, step: 0.05, formControlName: 'reInfectionRate'}">
+              </ng-container>
 
-          <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Mortalitätsrate', tooltip: 'Anteil der Infizierten, die an ihrer Erkrankung versterben.', value: this.paramForm.value.deathRate, sliderOptions:{floor: 0, ceil: 1, step: 0.01, showSelectionBar: true}, formControlName: 'deathRate'}">
-          </ng-container>
+              <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Mortalitätsrate', tooltip: 'Anteil der Infizierten, die an ihrer Erkrankung versterben.', floor: 0, ceil: 1, step: 0.01, formControlName: 'deathRate'}">
+              </ng-container>
 
-          <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Tägliche Kontakte', tooltip: 'Anzahl der Personen, mit denen jeder Einzelne täglich Kontakt hat. Sind dies mehr als in Ihrem Bewegungsradius möglich, werden Einzelne aus letzterer Gruppe mit erhöhter Wahrscheinlichkeit infiziert.', value: this.paramForm.value.numberOfContacts, sliderOptions:{floor: 0, ceil: 10, step: 1, showSelectionBar: true}, formControlName: 'numberOfContacts'}">
-          </ng-container>
+              <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Tägliche Kontakte', tooltip: 'Anzahl der Personen, mit denen jeder Einzelne täglich Kontakt hat. Sind dies mehr als in Ihrem Bewegungsradius möglich, werden Einzelne aus letzterer Gruppe mit erhöhter Wahrscheinlichkeit infiziert.', floor: 0, ceil: 10, step: 1, formControlName: 'numberOfContacts'}">
+              </ng-container>
 
-          <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Bewegungsradius', tooltip: 'Distamz, wie weit weg Personen reisen und sich somit gegenfalls infizieren können.', value: this.paramForm.value.movementRadius, sliderOptions:{floor: 0, ceil: 10, step: 1, showSelectionBar: true}, formControlName: 'movementRadius'}">
-          </ng-container>
+              <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Bewegungsradius', tooltip: 'Distamz, wie weit weg Personen reisen und sich somit gegenfalls infizieren können.', floor: 0, ceil: 10, step: 1, formControlName: 'movementRadius'}">
+              </ng-container>
+            </div>
+          </div>
+
         </mat-card-content>
       </mat-card>
-
     </div>
 
-    <div fxFlex="60" class="p-16">
+    <div #statistic fxFlex="auto" class="p-ex-top-16">
       <mat-card>
         <mat-card-header>
           <mat-card-title>Statistik</mat-card-title>
@@ -54,16 +58,12 @@
           </canvas>
         </mat-card-content>
       </mat-card>
-      <!-- <div *ngFor="let statistic of statistics">
-        {{statistic | json}}
-      </div> -->
-
     </div>
   </div>
 
-  <div fxFlex="40" class="canvas-wrapper">
+  <div #map fxFlex="auto" class="canvas-wrapper">
     <mat-card>
-      <mat-card-content style="margin-bottom: 0px;">
+      <mat-card-content>
         <canvas #canvas></canvas>
       </mat-card-content>
       <mat-card-actions>
@@ -100,28 +100,15 @@
   </div>
 </div>
 
-<!-- <ng-template #labeledPlainHtmlSlider let-name="name" let-valueRef="value" let-min="min" let-max="max" let-step="step" let-fCName="formControlName">
-  <div fxLayout="column" fxLayoutAlign="start stretch" [formGroup]="paramForm">
-    <div fxLayout="row" fxLayoutAlign="space-between stretch">
-      <label>
-        {{name}}
-      </label>
-      {{valueRef}}
-    </div>
-    <input type="range" [min]="min" [max]="max" [step]="step" [formControlName]="fCName">
-  </div>
-</ng-template> -->
-
-<ng-template #labeledSlider let-name="name" let-tooltip="tooltip" let-valueRef="value" let-options="sliderOptions" let-sliderControlName="formControlName">
-  <div fxLayout="column" fxLayoutAlign="start stretch" [formGroup]="paramForm" style="padding-bottom: 12px;">
+<ng-template #labeledSlider let-name="name" let-tooltip="tooltip" let-min="floor" let-max="ceil" let-step="step" let-property="formControlName">
+  <div fxLayout="column" fxLayoutAlign="start stretch" class="px-16">
     <div fxLayout="row" fxLayoutAlign="space-between stretch">
       <label>
         {{name}}
         <mat-icon [matTooltip]="tooltip" [inline]="true">help_outline</mat-icon>
       </label>
-
-      {{valueRef}}
+      {{currentParams[property]}}
     </div>
-    <ngx-slider [options]="options" [formControlName]="sliderControlName"></ngx-slider>
+    <mat-slider [min]="min" [max]="max" [step]="step" [(ngModel)]="currentParams[property]" (input)="currentParams[property] = $event.value"></mat-slider>
   </div>
 </ng-template>

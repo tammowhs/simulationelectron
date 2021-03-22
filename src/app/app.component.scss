@@ -8,23 +8,35 @@
   padding: 16px;
 }
 
-::ng-deep {
-  .ngx-slider {
-    margin-top: 15px !important;
-
-    .ngx-slider-bubble {
-      display: none !important;
-    }
-
-    .ngx-slider-pointer {
-      width: 16px !important;
-      height: 16px !important;
-      border-radius: 8px !important;
-      top: -6px !important;
-    }
-
-    .ngx-slider-pointer::after {
-      visibility: hidden !important;
-    }
-  }
+.p-ex-top-16 {
+  padding: 0px 16px 16px 16px;
 }
+
+.px-16 {
+  padding: 0px 16px;
+}
+
+.m-16 {
+  margin: 16px;
+}
+
+// ::ng-deep {
+//   .ngx-slider {
+//     margin-top: 15px !important;
+
+//     .ngx-slider-bubble {
+//       display: none !important;
+//     }
+
+//     .ngx-slider-pointer {
+//       width: 16px !important;
+//       height: 16px !important;
+//       border-radius: 8px !important;
+//       top: -6px !important;
+//     }
+
+//     .ngx-slider-pointer::after {
+//       visibility: hidden !important;
+//     }
+//   }
+// }
