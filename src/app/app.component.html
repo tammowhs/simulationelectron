@@ -1,62 +1,40 @@
 <div fxLayout="row" fxLayoutAlign="start stretch">
-  <div fxFlex="50" fxLayout="column" fxLayoutAlign="start stretch">
-    <div fxLayout="row" fxLayoutAlign="start stretch">
-      <div fxFlex="80" class="p-16" [formGroup]="paramForm">
+  <div fxFlex="60" fxLayout="column" fxLayoutAlign="start stretch">
+    <div class="p-16">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Parameter</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Inkubationszeit', tooltip: 'Anzahl Tage, die zwischen Ansteckung und ersten Symptome vergeht. Person ist bereits ansteckend.', value: this.paramForm.value.daysIncubated, sliderOptions:{floor: 1, ceil: 10, step: 1}, formControlName: 'daysIncubated'}">
+          </ng-container>
 
-        <mat-card>
-          <mat-card-header>
-            <mat-card-title>Parameter</mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Inkubationszeit', value: this.paramForm.value.daysIncubated, sliderOptions:{floor: 1, ceil: 10, step: 1}, formControlName: 'daysIncubated'}">
-            </ng-container>
-
-            <!-- <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Test', value: this.paramForm.value.test, sliderOptions:{floor: 1, ceil: 10, step: 1}, formControlName: 'test'}">
+          <!-- <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Test', value: this.paramForm.value.test, sliderOptions:{floor: 1, ceil: 10, step: 1}, formControlName: 'test'}">
             </ng-container> -->
 
-            <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Infektionszeit', value: this.paramForm.value.daysSymptomatic, sliderOptions:{floor: 1, ceil: 10, step: 1, showSelectionBar: true}, formControlName: 'daysSymptomatic'}">
-            </ng-container>
+          <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Infektionszeit', tooltip: 'Anzahl Tage, die zwischen ersten Symptomen und Ende der Infektion vergeht. Person ist weiterhin ansteckend, hat aber eine Chance sich zu Isolieren.', value: this.paramForm.value.daysSymptomatic, sliderOptions:{floor: 1, ceil: 10, step: 1, showSelectionBar: true}, formControlName: 'daysSymptomatic'}">
+          </ng-container>
 
-            <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Isolationsrate Symptomanten', value: this.paramForm.value.isolationRateSymptomatic, sliderOptions:{floor: 0, ceil: 1, step: 0.05, showSelectionBar: true}, formControlName: 'isolationRateSymptomatic'}">
-            </ng-container>
+          <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Isolationsrate Symptomanten', tooltip: 'Anteil aktiv Infizierter, die sich in Isolation begeben. Isolierte haben nur noch ein Zehntel der allgemeinen Ansteckungswahrscheinlichkeit.', value: this.paramForm.value.isolationRateSymptomatic, sliderOptions:{floor: 0, ceil: 1, step: 0.05, showSelectionBar: true}, formControlName: 'isolationRateSymptomatic'}">
+          </ng-container>
 
-            <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Übertragungsrate', value: this.paramForm.value.transmissionProbability, sliderOptions:{floor: 0, ceil: 1, step: 0.05, showSelectionBar: true}, formControlName: 'transmissionProbability'}">
-            </ng-container>
+          <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Übertragungsrate', tooltip: 'Allgemeine Ansteckungswahrscheinlichkeit', value: this.paramForm.value.transmissionProbability, sliderOptions:{floor: 0, ceil: 1, step: 0.05, showSelectionBar: true}, formControlName: 'transmissionProbability'}">
+          </ng-container>
 
-            <ng-container *ngTemplateOutlet="labeledSlider; context:{name: '2. Infektion', value: this.paramForm.value.reInfectionRate, sliderOptions:{floor: 0, ceil: 1, step: 0.05, showSelectionBar: true}, formControlName: 'reInfectionRate'}">
-            </ng-container>
+          <ng-container *ngTemplateOutlet="labeledSlider; context:{name: '2. Infektion', tooltip: 'Ansteckungswahrscheinlichkeit für eine Neuinfektion, nachdem man bereits erstmals geheilt war.', value: this.paramForm.value.reInfectionRate, sliderOptions:{floor: 0, ceil: 1, step: 0.05, showSelectionBar: true}, formControlName: 'reInfectionRate'}">
+          </ng-container>
 
-            <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Sterberate', value: this.paramForm.value.deathRate, sliderOptions:{floor: 0, ceil: 1, step: 0.01, showSelectionBar: true}, formControlName: 'deathRate'}">
-            </ng-container>
+          <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Mortalitätsrate', tooltip: 'Anteil der Infizierten, die an ihrer Erkrankung versterben.', value: this.paramForm.value.deathRate, sliderOptions:{floor: 0, ceil: 1, step: 0.01, showSelectionBar: true}, formControlName: 'deathRate'}">
+          </ng-container>
 
-            <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Tägliche Kontakte', value: this.paramForm.value.numberOfContacts, sliderOptions:{floor: 0, ceil: 10, step: 1, showSelectionBar: true}, formControlName: 'numberOfContacts'}">
-            </ng-container>
+          <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Tägliche Kontakte', tooltip: 'Anzahl der Personen, mit denen jeder Einzelne täglich Kontakt hat. Sind dies mehr als in Ihrem Bewegungsradius möglich, werden Einzelne aus letzterer Gruppe mit erhöhter Wahrscheinlichkeit infiziert.', value: this.paramForm.value.numberOfContacts, sliderOptions:{floor: 0, ceil: 10, step: 1, showSelectionBar: true}, formControlName: 'numberOfContacts'}">
+          </ng-container>
 
-            <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Bewegungsradius', value: this.paramForm.value.movementRadius, sliderOptions:{floor: 0, ceil: 10, step: 1, showSelectionBar: true}, formControlName: 'movementRadius'}">
-            </ng-container>
-          </mat-card-content>
-        </mat-card>
+          <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Bewegungsradius', tooltip: 'Distamz, wie weit weg Personen reisen und sich somit gegenfalls infizieren können.', value: this.paramForm.value.movementRadius, sliderOptions:{floor: 0, ceil: 10, step: 1, showSelectionBar: true}, formControlName: 'movementRadius'}">
+          </ng-container>
+        </mat-card-content>
+      </mat-card>
 
-      </div>
-
-      <div fxFlex="20" fxLayout="column" fxLayoutAlign="end stretch" class="p-16" [formGroup]="metaForm">
-        <!-- <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Test', value: this.paramForm.value.movementRadius, sliderOptions:{floor: 0, ceil: 10, step: 1, showSelectionBar: true, vertical: true}, formControlName: 'movementRadius'}">
-        </ng-container> -->
-        Geschwindigkeit {{this.metaForm.value.stepsPerSecond}}
-        <ngx-slider [options]="{ floor: 1, ceil: 20, step: 1, showSelectionBar: true }" [formControlName]="'stepsPerSecond'"></ngx-slider>
-        <button mat-icon-button *ngIf="!simulationEnded && !timerRunning" (click)="toggleSimulationExecution()">
-          <mat-icon matTooltip="Play">play_circle_outline</mat-icon>
-        </button>
-        <button mat-icon-button *ngIf="!simulationEnded && timerRunning" (click)="toggleSimulationExecution()">
-          <mat-icon matTooltip="Pause">pause_circle_outline</mat-icon>
-        </button>
-        <button mat-icon-button *ngIf="simulationEnded" (click)="reset()">
-          <mat-icon matTooltip="Erneut starten">replay</mat-icon>
-        </button>
-        <button mat-icon-button (click)="simulateStep()" [disabled]="simulationEnded || timerRunning">
-          <mat-icon matTooltip="Einzelner Schritt">redo</mat-icon>
-        </button>
-      </div>
     </div>
 
     <div fxFlex="60" class="p-16">
@@ -84,7 +62,41 @@
   </div>
 
   <div fxFlex="40" class="canvas-wrapper">
-    <canvas #canvas></canvas>
+    <mat-card>
+      <mat-card-content style="margin-bottom: 0px;">
+        <canvas #canvas></canvas>
+      </mat-card-content>
+      <mat-card-actions>
+        <div fxLayout="row" fxLayoutAlign="start stretch">
+          <div style="border-right: 1px solid rgb(70, 70, 70); padding-right: 16px;">
+            <button mat-icon-button *ngIf="simulationEnded" (click)="reset()">
+              <mat-icon matTooltip="Erneut starten">replay</mat-icon>
+            </button>
+
+            <button mat-icon-button *ngIf=" !simulationEnded && !timerRunning" (click)="toggleSimulationExecution()">
+              <mat-icon matTooltip="Play">play_circle_outline</mat-icon>
+            </button>
+
+            <button mat-icon-button *ngIf="!simulationEnded && timerRunning" (click)="toggleSimulationExecution()">
+              <mat-icon matTooltip="Pause">pause_circle_outline</mat-icon>
+            </button>
+
+            <button mat-icon-button (click)="simulateStep()" [disabled]="simulationEnded || timerRunning">
+              <mat-icon matTooltip="Einzelner Schritt">redo</mat-icon>
+            </button>
+          </div>
+
+          <div [formGroup]="metaForm" style="padding-left: 16px;">
+            Geschwindigkeit {{this.metaForm.value.stepsPerSecond}}
+            <mat-slider [min]="1" [max]="20" [step]="1"
+                        [value]="this.metaForm.get('stepsPerSecond')!.value" (input)="this.metaForm.get('stepsPerSecond')!.setValue($event.value)">
+            </mat-slider>
+          </div>
+
+        </div>
+
+      </mat-card-actions>
+    </mat-card>
   </div>
 </div>
 
@@ -100,12 +112,12 @@
   </div>
 </ng-template> -->
 
-<ng-template #labeledSlider let-name="name" let-valueRef="value" let-options="sliderOptions" let-sliderControlName="formControlName">
+<ng-template #labeledSlider let-name="name" let-tooltip="tooltip" let-valueRef="value" let-options="sliderOptions" let-sliderControlName="formControlName">
   <div fxLayout="column" fxLayoutAlign="start stretch" [formGroup]="paramForm" style="padding-bottom: 12px;">
     <div fxLayout="row" fxLayoutAlign="space-between stretch">
       <label>
         {{name}}
-        <mat-icon matTooltip="Info about the parameter" [inline]="true">help_outline</mat-icon>
+        <mat-icon [matTooltip]="tooltip" [inline]="true">help_outline</mat-icon>
       </label>
 
       {{valueRef}}
