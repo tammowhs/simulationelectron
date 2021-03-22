@@ -2,34 +2,40 @@
   <div fxFlex="50" fxLayout="column" fxLayoutAlign="start stretch">
     <div fxLayout="row" fxLayoutAlign="start stretch">
       <div fxFlex="80" class="p-16" [formGroup]="paramForm">
-        <h3>Parameter</h3>
 
-        <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Inkubationszeit', value: this.paramForm.value.daysIncubated, sliderOptions:{floor: 1, ceil: 10, step: 1}, formControlName: 'daysIncubated'}">
-        </ng-container>
+        <mat-card>
+          <mat-card-header>
+            <mat-card-title>Parameter</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Inkubationszeit', value: this.paramForm.value.daysIncubated, sliderOptions:{floor: 1, ceil: 10, step: 1}, formControlName: 'daysIncubated'}">
+            </ng-container>
 
-        <!-- <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Test', value: this.paramForm.value.test, sliderOptions:{floor: 1, ceil: 10, step: 1}, formControlName: 'test'}">
-        </ng-container> -->
+            <!-- <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Test', value: this.paramForm.value.test, sliderOptions:{floor: 1, ceil: 10, step: 1}, formControlName: 'test'}">
+            </ng-container> -->
 
-        <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Infektionszeit', value: this.paramForm.value.daysSymptomatic, sliderOptions:{floor: 1, ceil: 10, step: 1, showSelectionBar: true}, formControlName: 'daysSymptomatic'}">
-        </ng-container>
+            <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Infektionszeit', value: this.paramForm.value.daysSymptomatic, sliderOptions:{floor: 1, ceil: 10, step: 1, showSelectionBar: true}, formControlName: 'daysSymptomatic'}">
+            </ng-container>
 
-        <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Isolationsrate Symptomanten', value: this.paramForm.value.isolationRateSymptomatic, sliderOptions:{floor: 0, ceil: 1, step: 0.05, showSelectionBar: true}, formControlName: 'isolationRateSymptomatic'}">
-        </ng-container>
+            <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Isolationsrate Symptomanten', value: this.paramForm.value.isolationRateSymptomatic, sliderOptions:{floor: 0, ceil: 1, step: 0.05, showSelectionBar: true}, formControlName: 'isolationRateSymptomatic'}">
+            </ng-container>
 
-        <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Übertragungsrate', value: this.paramForm.value.transmissionProbability, sliderOptions:{floor: 0, ceil: 1, step: 0.05, showSelectionBar: true}, formControlName: 'transmissionProbability'}">
-        </ng-container>
+            <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Übertragungsrate', value: this.paramForm.value.transmissionProbability, sliderOptions:{floor: 0, ceil: 1, step: 0.05, showSelectionBar: true}, formControlName: 'transmissionProbability'}">
+            </ng-container>
 
-        <ng-container *ngTemplateOutlet="labeledSlider; context:{name: '2. Infektion', value: this.paramForm.value.reInfectionRate, sliderOptions:{floor: 0, ceil: 1, step: 0.05, showSelectionBar: true}, formControlName: 'reInfectionRate'}">
-        </ng-container>
+            <ng-container *ngTemplateOutlet="labeledSlider; context:{name: '2. Infektion', value: this.paramForm.value.reInfectionRate, sliderOptions:{floor: 0, ceil: 1, step: 0.05, showSelectionBar: true}, formControlName: 'reInfectionRate'}">
+            </ng-container>
 
-        <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Sterberate', value: this.paramForm.value.deathRate, sliderOptions:{floor: 0, ceil: 1, step: 0.01, showSelectionBar: true}, formControlName: 'deathRate'}">
-        </ng-container>
+            <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Sterberate', value: this.paramForm.value.deathRate, sliderOptions:{floor: 0, ceil: 1, step: 0.01, showSelectionBar: true}, formControlName: 'deathRate'}">
+            </ng-container>
 
-        <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Tägliche Kontakte', value: this.paramForm.value.numberOfContacts, sliderOptions:{floor: 0, ceil: 10, step: 1, showSelectionBar: true}, formControlName: 'numberOfContacts'}">
-        </ng-container>
+            <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Tägliche Kontakte', value: this.paramForm.value.numberOfContacts, sliderOptions:{floor: 0, ceil: 10, step: 1, showSelectionBar: true}, formControlName: 'numberOfContacts'}">
+            </ng-container>
 
-        <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Bewegungsradius', value: this.paramForm.value.movementRadius, sliderOptions:{floor: 0, ceil: 10, step: 1, showSelectionBar: true}, formControlName: 'movementRadius'}">
-        </ng-container>
+            <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Bewegungsradius', value: this.paramForm.value.movementRadius, sliderOptions:{floor: 0, ceil: 10, step: 1, showSelectionBar: true}, formControlName: 'movementRadius'}">
+            </ng-container>
+          </mat-card-content>
+        </mat-card>
 
       </div>
 
@@ -45,19 +51,26 @@
     </div>
 
     <div fxFlex="60" class="p-16">
-      <h3>Statistik</h3>
-      Tag: {{day | json}}
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Statistik</mat-card-title>
+          <mat-card-subtitle>Tag: {{day | json}}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <canvas baseChart
+                  [chartType]="'line'"
+                  [labels]="lineChartLabels"
+                  [datasets]="lineChartData"
+                  [options]="lineChartOptions"
+                  [colors]="lineChartColors"
+                  [legend]="true">
+          </canvas>
+        </mat-card-content>
+      </mat-card>
       <!-- <div *ngFor="let statistic of statistics">
         {{statistic | json}}
       </div> -->
-      <canvas baseChart
-              [chartType]="'line'"
-              [labels]="lineChartLabels"
-              [datasets]="lineChartData"
-              [options]="lineChartOptions"
-              [colors]="lineChartColors"
-              [legend]="true">
-      </canvas>
+
     </div>
   </div>
 
@@ -82,7 +95,7 @@
   <div fxLayout="column" fxLayoutAlign="start stretch" [formGroup]="paramForm">
     <div fxLayout="row" fxLayoutAlign="space-between stretch">
       <label>
-        <b>{{name}}</b>
+        {{name}}
       </label>
       <!-- | percent -->
       {{valueRef}}
@@ -91,4 +104,4 @@
   </div>
 </ng-template>
 
-<router-outlet></router-outlet>
+<!-- <router-outlet></router-outlet> -->

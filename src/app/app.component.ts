@@ -70,7 +70,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   public lineChartOptions: ChartOptions = {
     animation: {
-      duration: 0 //performance
+      duration: 0 // performance
     },
     responsive: true,
     scales: {
@@ -83,13 +83,16 @@ export class AppComponent implements OnInit, AfterViewInit {
   };
   public lineChartColors: Color[] = [
     {
-      backgroundColor: 'rgba(255,0,0,0.3)'
+      backgroundColor: GridStateColor.Infected
     },
     {
-      backgroundColor: 'rgba(0,0,255,0.3)'
+      backgroundColor: GridStateColor.Recovered
     },
     {
-      backgroundColor: 'rgba(0,0,0,0.3)'
+      backgroundColor: GridStateColor.Deceased
+    },
+    {
+      backgroundColor: GridStateColor.Receptive
     }
   ];
 
