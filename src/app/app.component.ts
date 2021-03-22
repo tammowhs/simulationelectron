@@ -40,7 +40,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     numberOfContacts: 4,
     reInfectionRate: 0.05,
   };
-  paramForm: FormGroup;
+  public paramForm: FormGroup;
 
   private readonly metaParam: MetaParameter = {
     nRows: 69,
@@ -48,14 +48,10 @@ export class AppComponent implements OnInit, AfterViewInit {
     nodeSize: 10,
     stepsPerSecond: 5,
   };
-  metaForm: FormGroup;
-  intervalPeriod = new BehaviorSubject<number>(1000 / this.metaParam.stepsPerSecond);
+  private intervalPeriod = new BehaviorSubject<number>(1000 / this.metaParam.stepsPerSecond);
+  public metaForm: FormGroup;
 
 
-
-  colorScheme = {
-    domain: [GridStateColor.Infected, GridStateColor.Recovered, GridStateColor.Deceased, GridStateColor.Receptive]
-  };
 
   public lineChartData: ChartDataSets[] = [
     { data: [], label: 'Infektiös', stack: 'a' },
@@ -64,9 +60,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     { data: [], label: 'Gesund', stack: 'a' },
   ];
 
-  public lineChartLabels: Label[] = [
-    // '1', '2', '3', '4', '5', '6', '7'
-  ];
+  public lineChartLabels: Label[] = [];
 
   public lineChartOptions: ChartOptions = {
     animation: {
@@ -81,6 +75,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       ]
     }
   };
+
   public lineChartColors: Color[] = [
     {
       backgroundColor: GridStateColor.Infected
@@ -130,10 +125,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     }];
 
     this.initInterval();
-
-    // const canvas = this.canvasRef.nativeElement;
-    // canvas.width = this.nodeSize * this.nCols;
-    // canvas.height = this.nodeSize * this.nRows;
   }
 
   ngAfterViewInit() {
