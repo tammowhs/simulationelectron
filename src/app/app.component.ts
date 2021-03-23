@@ -66,6 +66,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       duration: 0 // performance
     },
     responsive: true,
+    maintainAspectRatio: false,
     scales: {
       yAxes: [
         {
@@ -77,7 +78,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   public lineChartColors: Color[] = [
     {
-      backgroundColor: GridStateColor.Infected
+      backgroundColor: 'rgba(255, 0, 0, 0.65)'
     },
     {
       backgroundColor: GridStateColor.Recovered

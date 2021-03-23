@@ -2,7 +2,7 @@
   <div fxFlex="60" fxLayout="column" fxLayoutAlign="start stretch">
 
     <div #parameter fxFlex="40" class="p-16">
-      <mat-card>
+      <mat-card class="paramater-card">
         <mat-card-header>
           <mat-card-title>Parameter</mat-card-title>
         </mat-card-header>
@@ -43,13 +43,13 @@
     </div>
 
     <div #statistic fxFlex="60" class="p-ex-top-16">
-      <mat-card>
+      <mat-card class="statistic-card">
         <mat-card-header>
           <mat-card-title>Statistik</mat-card-title>
           <mat-card-subtitle>Tag: {{day | json}}</mat-card-subtitle>
         </mat-card-header>
-        <mat-card-content>
-          <canvas baseChart class="statistic"
+        <mat-card-content class="statistic-card-content">
+          <canvas baseChart class="statistic-canvas"
                   [chartType]="'line'"
                   [labels]="lineChartLabels"
                   [datasets]="lineChartData"
