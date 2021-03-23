@@ -76,7 +76,7 @@
       </mat-card-content>
       <mat-card-actions>
         <div fxLayout="row" fxLayoutAlign="start stretch">
-          <div style="border-right: 1px solid rgb(70, 70, 70); padding-right: 16px;">
+          <div class="pr-16 border-right">
             <button mat-icon-button *ngIf="simulationEnded" (click)="reset()">
               <mat-icon matTooltip="Erneut starten">replay</mat-icon>
             </button>
@@ -94,10 +94,10 @@
             </button>
           </div>
 
-          <div [formGroup]="metaForm" style="padding-left: 16px;">
-            Geschwindigkeit {{this.metaForm.value.stepsPerSecond}}
+          <div class="pl-16">
+            Geschwindigkeit {{currentStepsPerSecond}}
             <mat-slider [min]="1" [max]="20" [step]="1"
-                        [value]="this.metaForm.get('stepsPerSecond')!.value" (input)="this.metaForm.get('stepsPerSecond')!.setValue($event.value)">
+                        [ngModel]="currentStepsPerSecond" (input)="currentStepsPerSecond = $event.value; intervalPeriod.next(1000 / $event.value);">
             </mat-slider>
           </div>
 
@@ -117,6 +117,6 @@
       </label>
       {{currentParams[property]}}
     </div>
-    <mat-slider [min]="min" [max]="max" [step]="step" [(ngModel)]="currentParams[property]" (input)="currentParams[property] = $event.value"></mat-slider>
+    <mat-slider [min]="min" [max]="max" [step]="step" [ngModel]="currentParams[property]" (input)="currentParams[property] = $event.value"></mat-slider>
   </div>
 </ng-template>

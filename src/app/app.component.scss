@@ -20,8 +20,20 @@
   padding: 0px 16px;
 }
 
+.pl-16 {
+  padding-left: 16px;
+}
+
+.pr-16 {
+  padding-right: 16px;
+}
+
 .m-16 {
   margin: 16px;
+}
+
+.border-right {
+  border-right: 1px solid rgb(70, 70, 70);
 }
 
 // .statistic-card {

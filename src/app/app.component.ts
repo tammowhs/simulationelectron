@@ -40,6 +40,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     numberOfContacts: 4,
     reInfectionRate: 0.05,
   };
+  public currentParams: SimulationParameter;
 
   private readonly metaParam: MetaParameter = {
     nRows: 69,
@@ -47,10 +48,8 @@ export class AppComponent implements OnInit, AfterViewInit {
     nodeSize: 10,
     stepsPerSecond: 5,
   };
-  private intervalPeriod = new BehaviorSubject<number>(1000 / this.metaParam.stepsPerSecond);
-  public metaForm: FormGroup;
-
-
+  public currentStepsPerSecond: number;
+  public intervalPeriod = new BehaviorSubject<number>(1000 / this.metaParam.stepsPerSecond);
 
   public lineChartData: ChartDataSets[] = [
     { data: [], label: 'Infektiös', stack: 'a' },
@@ -91,8 +90,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
   ];
 
-  public currentParams: SimulationParameter;
-
   public resetStatistics() {
     this.lineChartData[0].data = [];
     this.lineChartData[1].data = [];
@@ -102,14 +99,12 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.lineChartLabels = [];
   }
 
-  constructor(
-    private randomService: RandomService,
-    private formBuilder: FormBuilder) { }
+  constructor(private randomService: RandomService) { }
 
   ngOnInit() {
-    this.initForms();
-
     this.currentParams = { ...this.defaultSimulationParam };
+    this.currentStepsPerSecond = this.metaParam.stepsPerSecond;
+    this.intervalPeriod.next(1000 / this.currentStepsPerSecond);
 
     this.initGrid();
     this.initPatientsZero();
@@ -172,28 +167,13 @@ export class AppComponent implements OnInit, AfterViewInit {
       });
   }
 
-  private initForms() {
-
-    this.metaForm = this.formBuilder.group({
-      stepsPerSecond: [this.metaParam.stepsPerSecond, Validators.required],
-    });
-
-    this.metaForm.valueChanges
-      .pipe(
-        debounceTime(200),
-      )
-      .subscribe(formValue => {
-        this.intervalPeriod.next(1000 / formValue.stepsPerSecond);
-      });
-
-  }
-
   public reset() {
     console.log('reset');
 
     this.currentParams = { ...this.defaultSimulationParam };
+    this.currentStepsPerSecond = this.metaParam.stepsPerSecond;
+    this.intervalPeriod.next(1000 / this.currentStepsPerSecond);
 
-    this.initForms();
     this.initGrid();
     this.initPatientsZero();
 
