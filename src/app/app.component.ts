@@ -93,6 +93,15 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   public currentParams: SimulationParameter;
 
+  public resetStatistics() {
+    this.lineChartData[0].data = [];
+    this.lineChartData[1].data = [];
+    this.lineChartData[2].data = [];
+    this.lineChartData[3].data = [];
+
+    this.lineChartLabels = [];
+  }
+
   constructor(
     private randomService: RandomService,
     private formBuilder: FormBuilder) { }
@@ -103,7 +112,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.currentParams = { ...this.defaultSimulationParam };
 
     this.initGrid();
-    this.initPatientZero();
+    this.initPatientsZero();
 
     this.timerRunning = false;
     this.simulationEnded = false;
@@ -141,11 +150,14 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
   }
 
-  private initPatientZero() {
-    const centerRow = Math.floor(this.metaParam.nRows / 2);
-    const centerCol = Math.floor(this.metaParam.nCols / 2);
+  private initPatientsZero(patientCoordinates?: { row: number, col: number }[]) {
+    if (!patientCoordinates) {
+      const centerRow = Math.floor(this.metaParam.nRows / 2);
+      const centerCol = Math.floor(this.metaParam.nCols / 2);
 
-    this.grid[centerRow][centerCol].state = GridState.Exposed;
+      patientCoordinates = [{ row: centerRow, col: centerCol }];
+    }
+    patientCoordinates.forEach(coord => this.grid[coord.row][coord.col].state = GridState.Exposed);
   }
 
   private initInterval() {
@@ -183,7 +195,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
     this.initForms();
     this.initGrid();
-    this.initPatientZero();
+    this.initPatientsZero();
 
     this.initInterval();
 

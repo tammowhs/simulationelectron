@@ -25,20 +25,25 @@
 }
 
 // .statistic-card {
-  //   max-height: calc(100% - 32px);
+//   max-height: calc(100% - 32px);
 
-  //   .statistic-card-content {
-  //     max-height: calc(100% - 60px) !important;
-    .statistic-canvas {
-      max-height: 100% !important;
-      height: 456px !important;
-      // border: solid black 1px;
-    }
+//   .statistic-card-content {
+//     max-height: calc(100% - 60px) !important;
+.statistic-canvas {
+  max-height: 100% !important;
+  height: 456px !important;
+  // border: solid black 1px;
+}
+
 //   }
 // }
 
 .paramater-card {
   max-height: calc(100% - 32px);
+}
+
+.w-100 {
+  width: 100%;
 }
 
 // ::ng-deep {
