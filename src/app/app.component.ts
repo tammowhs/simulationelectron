@@ -200,6 +200,11 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.timerRunning = !this.timerRunning;
   }
 
+  public singleStep() {
+    // this.simulateStep();
+    this.simulationStepService.simulateStep(this.defaultSimulationParam);
+  }
+
   public simulateStep() {
     this.day++;
 

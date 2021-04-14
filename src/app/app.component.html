@@ -89,7 +89,7 @@
               <mat-icon matTooltip="Pause">pause_circle_outline</mat-icon>
             </button>
 
-            <button mat-icon-button (click)="simulateStep()" [disabled]="simulationEnded || timerRunning">
+            <button mat-icon-button (click)="singleStep()" [disabled]="simulationEnded || timerRunning">
               <mat-icon matTooltip="Einzelner Schritt">redo</mat-icon>
             </button>
           </div>
