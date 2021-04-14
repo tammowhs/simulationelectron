@@ -1,11 +1,11 @@
 export class Statistic {
   day: number;
   infectious: number;
-  deltaInfectious: number;
+  deltaInfectious?: number;
   recovered: number;
-  deltaRecovered: number;
+  deltaRecovered?: number;
   deceased: number;
-  deltaDeceased: number;
+  deltaDeceased?: number;
   healthy: number;
-  healthyDelta: number;
+  healthyDelta?: number;
 }

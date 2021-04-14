@@ -60,10 +60,6 @@ export class GridNode {
     return this.isolating;
   }
 
-  // startDay() {
-  //   this._nextState = this._state;
-  // }
-
   // allowDeaths: boolean, deathRate: number
   evaluateNewState(daysIncubating: number, daysSymptomatic: number, deathRate: number, isolationRate: number) {
     if (this.nextState !== this.state) {
@@ -72,32 +68,23 @@ export class GridNode {
     } else {
       this.daysInCurrentState++;
 
-      if (this.isExposed) {
-        // const effectiveDaysIncubating = this.randomService.randomInRange(daysIncubating[0], daysIncubating[1]);
-        if (this.daysInCurrentState >= daysIncubating) {
-          this.state = GridState.Infected;
-          this.daysInCurrentState = 0;
-          if (this.randomService.random() < isolationRate) {
-            this.isolating = true;
-          }
+      if (this.isExposed && this.daysInCurrentState >= daysIncubating) {
+        this.state = GridState.Infected;
+        this.daysInCurrentState = 0;
+        if (this.randomService.random() < isolationRate) {
+          this.isolating = true;
         }
       }
 
-      if (this.isInfected) {
-        if (this.daysInCurrentState >= daysSymptomatic) {
-          // if (overHospitalCapacity) {
-          //   deathRate = deathRate * 2;
-          // }
-
-          if (this.randomService.random() < deathRate) {
-            this.state = GridState.Deceased;
-          } else {
-            this.state = GridState.Recovered;
-          }
-
-          this.daysInCurrentState = 0;
-          this.isolating = false;
+      if (this.isInfected && this.daysInCurrentState >= daysSymptomatic) {
+        if (this.randomService.random() < deathRate) {
+          this.state = GridState.Deceased;
+        } else {
+          this.state = GridState.Recovered;
         }
+
+        this.daysInCurrentState = 0;
+        this.isolating = false;
       }
     }
   }
