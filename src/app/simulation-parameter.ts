@@ -7,5 +7,4 @@ export class SimulationParameter {
   movementRadius: number;
   numberOfContacts: number;
   reInfectionRate: number;
-  // test: [number, number];
 }

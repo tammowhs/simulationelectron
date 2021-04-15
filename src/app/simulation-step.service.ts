@@ -58,51 +58,15 @@ export class SimulationStepService {
       }
     }
 
-    let currentlyInfectious = 0;
-    let currentlyRecovered = 0;
-    let currentlyDeceased = 0;
-    let currentlyReceptive = 0;
+    const newStatistic: Statistic = this.evaluateNewState(currentParams, day);
 
-    for (let r = 0; r < this.currentGrid.length; r++) {
-      for (let c = 0; c < this.currentGrid[0].length; c++) {
-        const node = this.currentGrid[r][c];
-        node.evaluateNewState(currentParams.daysIncubated,
-                              currentParams.daysSymptomatic,
-                              currentParams.deathRate,
-                              currentParams.isolationRateSymptomatic);
-
-        if (node.isInfectious) {
-          currentlyInfectious++;
-        }
-
-        if (node.isRecovered) {
-          currentlyRecovered++;
-        }
-
-        if (node.isDeceased) {
-          currentlyDeceased++;
-        }
-
-        if (node.isReceptive) {
-          currentlyReceptive++;
-        }
-      }
-    }
-
-    this._grid.next(this.currentGrid);
-
-    const newStatistic: Statistic = {
-      day: day,
-      infectious: currentlyInfectious,
-      recovered: currentlyRecovered,
-      deceased: currentlyDeceased,
-      healthy: currentlyReceptive,
-    };
     const currentStatistics = this._statistics.getValue();
     currentStatistics.push(newStatistic);
     this._statistics.next(currentStatistics);
 
-    this._simulationEnded.next(currentlyInfectious === 0);
+    this._grid.next(this.currentGrid);
+
+    this._simulationEnded.next(newStatistic.infectious === 0);
   }
 
   public reset() {
@@ -153,6 +117,47 @@ export class SimulationStepService {
 
   private isNodeInGrid(row: number, col: number): boolean {
     return row >= 0 && col >= 0 && row < this.currentGrid.length && col < this.currentGrid[0].length;
+  }
+
+  private evaluateNewState(currentParams: SimulationParameter, day: number): Statistic {
+    let currentlyInfectious = 0;
+    let currentlyRecovered = 0;
+    let currentlyDeceased = 0;
+    let currentlyReceptive = 0;
+
+    for (let r = 0; r < this.currentGrid.length; r++) {
+      for (let c = 0; c < this.currentGrid[0].length; c++) {
+        const node = this.currentGrid[r][c];
+        node.evaluateNewState(currentParams.daysIncubated,
+                              currentParams.daysSymptomatic,
+                              currentParams.deathRate,
+                              currentParams.isolationRateSymptomatic);
+
+        if (node.isInfectious) {
+          currentlyInfectious++;
+        }
+
+        if (node.isRecovered) {
+          currentlyRecovered++;
+        }
+
+        if (node.isDeceased) {
+          currentlyDeceased++;
+        }
+
+        if (node.isReceptive) {
+          currentlyReceptive++;
+        }
+      }
+    }
+
+    return {
+      day: day,
+      infectious: currentlyInfectious,
+      recovered: currentlyRecovered,
+      deceased: currentlyDeceased,
+      healthy: currentlyReceptive,
+    };
   }
 
   private getInitialGrid(): GridNode[][] {
