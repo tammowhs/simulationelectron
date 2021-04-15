@@ -1,9 +1,8 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ChartDataSets, ChartOptions } from 'chart.js';
 import { Color, Label } from 'ng2-charts';
 import { BehaviorSubject, interval } from 'rxjs';
 import { filter, switchMap, takeWhile } from 'rxjs/operators';
-import { GridNode } from './grid-node';
 import { GridStateColor } from './grid-state.enum';
 import { MetaParameter } from './meta-parameter';
 import { SimulationParameter } from './simulation-parameter';
@@ -15,13 +14,6 @@ import { SimulationStepService } from './simulation-step.service';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-
-  @ViewChild('canvas', { static: true })
-  public canvasRef: ElementRef<HTMLCanvasElement>;
-
-  private context: CanvasRenderingContext2D;
-
-  private grid: GridNode[][] = [];
 
   public timerRunning: boolean;
   public simulationEnded: boolean;
@@ -102,12 +94,6 @@ export class AppComponent implements OnInit {
     this.timerRunning = false;
     this.initInterval();
 
-    const canvas = this.canvasRef.nativeElement;
-    canvas.width = this.metaParam.nodeSize * this.metaParam.nCols;
-    canvas.height = this.metaParam.nodeSize * this.metaParam.nRows;
-
-    this.context = canvas.getContext('2d')!;
-
     this.simulationStepService.simulationEnded.subscribe(value => {
       this.simulationEnded = value;
     });
@@ -121,11 +107,6 @@ export class AppComponent implements OnInit {
       this.lineChartData[2].data?.push(newestStatistic.deceased);
       this.lineChartData[3].data?.push(newestStatistic.healthy);
       this.lineChartLabels.push(newestStatistic.day.toString());
-    });
-
-    this.simulationStepService.grid.subscribe(value => {
-      this.grid = value;
-      this.draw();
     });
   }
 
@@ -148,8 +129,6 @@ export class AppComponent implements OnInit {
     this.simulationStepService.reset();
     this.timerRunning = false;
     this.initInterval();
-
-    this.draw();
   }
 
   public toggleSimulationExecution() {
@@ -158,48 +137,5 @@ export class AppComponent implements OnInit {
 
   public singleStep() {
     this.simulationStepService.simulateStep(this.currentParams);
-  }
-
-  private draw() {
-    this.context.fillStyle = '#fff';
-
-    const gridWidth = this.metaParam.nCols * this.metaParam.nodeSize;
-    this.context.fillRect(0, 0, gridWidth, gridWidth);
-
-    for (let r = 0; r < this.metaParam.nRows; r++) {
-      for (let c = 0; c < this.metaParam.nCols; c++) {
-        const node = this.grid[r][c];
-        this.drawCell(r, c, node);
-      }
-    }
-  }
-
-  private drawCell(r: number, c: number, node: GridNode) {
-    const y = r * this.metaParam.nodeSize;
-    const x = c * this.metaParam.nodeSize;
-
-    if (node.isExposed) {
-      this.context.fillStyle = GridStateColor.Exposed;
-    }
-
-    if (node.isInfected) {
-      this.context.fillStyle = GridStateColor.Infected;
-    }
-
-    if (node.isRecovered) {
-      this.context.fillStyle = GridStateColor.Recovered;
-    }
-
-    if (node.isDeceased) {
-      this.context.fillStyle = GridStateColor.Deceased;
-    }
-
-    if (node.isReceptive) {
-      this.context.fillStyle = GridStateColor.Receptive;
-    }
-
-    const gap = 1;
-
-    this.context.fillRect(x, y, this.metaParam.nodeSize - gap, this.metaParam.nodeSize - gap);
   }
 }

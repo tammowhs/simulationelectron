@@ -14,10 +14,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSliderModule } from '@angular/material/slider';
+import { PlayingFieldComponent } from './playing-field/playing-field.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    PlayingFieldComponent
   ],
   imports: [
     BrowserModule,
