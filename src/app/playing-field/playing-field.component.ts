@@ -16,44 +16,42 @@ export class PlayingFieldComponent implements OnInit {
 
   private context: CanvasRenderingContext2D;
 
-  private metaParam: MetaParameter;
-
   constructor(private simulationStepService: SimulationStepService){ }
   
   ngOnInit(): void {
-    this.metaParam = this.simulationStepService.metaParam;
-
+    const nodeSize = this.simulationStepService.metaParam.nodeSize;
+    
     const canvas = this.canvasRef.nativeElement;
     this.context = canvas.getContext('2d')!;
-    canvas.width = this.metaParam.nodeSize * this.metaParam.nCols;
-    canvas.height = this.metaParam.nodeSize * this.metaParam.nRows;
+    canvas.width = nodeSize * this.simulationStepService.metaParam.nCols;
+    canvas.height = nodeSize * this.simulationStepService.metaParam.nRows;
     
     this.simulationStepService.grid.subscribe(value => {
-      this.draw(value);
+      this.draw(value, nodeSize);
     })
   }
 
-  private draw(grid: GridNode[][]) {
+  private draw(grid: GridNode[][], nodeSize: number) {
     this.context.fillStyle = '#fff';
 
     const numberOfRows = grid.length;
     const numberOfCols = grid[0].length;
 
-    const gridHeight = numberOfRows * this.metaParam.nodeSize;
-    const gridWidth = numberOfCols * this.metaParam.nodeSize;
+    const gridHeight = numberOfRows * nodeSize;
+    const gridWidth = numberOfCols * nodeSize;
     this.context.fillRect(0, 0, gridWidth, gridHeight);
 
     for (let r = 0; r < numberOfRows; r++) {
       for (let c = 0; c < numberOfCols; c++) {
         const node = grid[r][c];
-        this.drawCell(r, c, node);
+        this.drawCell(r, c, node, nodeSize);
       }
     }
   }
 
-  private drawCell(row: number, col: number, node: GridNode) {
-    const y = row * this.metaParam.nodeSize;
-    const x = col * this.metaParam.nodeSize;
+  private drawCell(row: number, col: number, node: GridNode, nodeSize: number) {
+    const y = row * nodeSize;
+    const x = col * nodeSize;
 
     if (node.isExposed) {
       this.context.fillStyle = GridStateColor.Exposed;
@@ -77,7 +75,7 @@ export class PlayingFieldComponent implements OnInit {
 
     const gap = 1;
 
-    this.context.fillRect(x, y, this.metaParam.nodeSize - gap, this.metaParam.nodeSize - gap);
+    this.context.fillRect(x, y, nodeSize - gap, nodeSize - gap);
   }
   
 }

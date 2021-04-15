@@ -1,10 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ChartDataSets, ChartOptions } from 'chart.js';
-import { Color, Label } from 'ng2-charts';
 import { BehaviorSubject, interval } from 'rxjs';
 import { filter, switchMap, takeWhile } from 'rxjs/operators';
-import { GridStateColor } from './grid-state.enum';
-import { MetaParameter } from './meta-parameter';
 import { SimulationParameter } from './simulation-parameter';
 import { SimulationStepService } from './simulation-step.service';
 
@@ -30,15 +26,13 @@ export class AppComponent implements OnInit {
   };
   public currentParams: SimulationParameter;
 
-  private metaParam: MetaParameter;
   public currentStepsPerSecond: number;
   public intervalPeriod: BehaviorSubject<number>;
 
   constructor(public simulationStepService: SimulationStepService) { }
 
   ngOnInit() {
-    this.metaParam = this.simulationStepService.metaParam;
-    this.currentStepsPerSecond = this.metaParam.stepsPerSecond;
+    this.currentStepsPerSecond = this.simulationStepService.metaParam.stepsPerSecond;
     this.intervalPeriod = new BehaviorSubject<number>(1000 / this.currentStepsPerSecond);
 
     this.currentParams = { ...this.defaultSimulationParam };
@@ -64,8 +58,8 @@ export class AppComponent implements OnInit {
 
   public reset() {
     this.currentParams = { ...this.defaultSimulationParam };
-    this.currentStepsPerSecond = this.metaParam.stepsPerSecond;
-    this.intervalPeriod.next(1000 / this.metaParam.stepsPerSecond);
+    this.currentStepsPerSecond = this.simulationStepService.metaParam.stepsPerSecond;
+    this.intervalPeriod.next(1000 / this.currentStepsPerSecond);
     
     this.simulationStepService.reset();
     this.timerRunning = false;

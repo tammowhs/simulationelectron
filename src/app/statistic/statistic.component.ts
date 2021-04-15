@@ -11,21 +11,6 @@ import { GridStateColor } from '../grid-state.enum';
 })
 export class StatisticComponent implements OnInit {
 
-  constructor(public simulationStepService: SimulationStepService) { }
-
-  ngOnInit() {
-    this.simulationStepService.statistics.subscribe(value => {
-      const newestStatistic = value[value.length - 1];
-      
-      // statisticForNg2Chart
-      this.lineChartData[0].data?.push(newestStatistic.infectious);
-      this.lineChartData[1].data?.push(newestStatistic.recovered);
-      this.lineChartData[2].data?.push(newestStatistic.deceased);
-      this.lineChartData[3].data?.push(newestStatistic.healthy);
-      this.lineChartLabels.push(newestStatistic.day.toString());
-    });
-  }
-
   public lineChartData: ChartDataSets[] = [
     { data: [], label: 'Infektiös', stack: 'a' },
     { data: [], label: 'Geheilt', stack: 'a' },
@@ -64,6 +49,21 @@ export class StatisticComponent implements OnInit {
       backgroundColor: GridStateColor.Receptive
     }
   ];
+
+  constructor(public simulationStepService: SimulationStepService) { }
+
+  ngOnInit() {
+    this.simulationStepService.statistics.subscribe(value => {
+      const newestStatistic = value[value.length - 1];
+      
+      // statisticForNg2Chart
+      this.lineChartData[0].data?.push(newestStatistic.infectious);
+      this.lineChartData[1].data?.push(newestStatistic.recovered);
+      this.lineChartData[2].data?.push(newestStatistic.deceased);
+      this.lineChartData[3].data?.push(newestStatistic.healthy);
+      this.lineChartLabels.push(newestStatistic.day.toString());
+    });
+  }
 
   public resetStatistics() {
     this.lineChartData[0].data = [];

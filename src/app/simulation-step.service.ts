@@ -184,6 +184,10 @@ export class SimulationStepService {
 
       patientCoordinates = [{ row: centerRow, col: centerCol }];
     }
-    patientCoordinates.forEach(coord => grid[coord.row][coord.col].state = GridState.Exposed);
+    patientCoordinates.forEach(coord => {
+      const node = grid[coord.row][coord.col];
+      node.nextState = GridState.Exposed;
+      node.evaluateNewState(0,0,0,0);
+    });
   }
 }

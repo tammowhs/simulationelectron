@@ -6,7 +6,8 @@
 /out-tsc
 # Only exists if Bazel was run
 /bazel-out
-/simulationelectron-win32-x64
+
+/to-win32-x64
 
 # dependencies
 /node_modules

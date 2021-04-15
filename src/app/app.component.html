@@ -10,30 +10,30 @@
           <div fxLayout="row" fxLayoutAlign="start stretch">
 
             <div fxFlex=50>
-              <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Inkubationszeit', tooltip: 'Anzahl Tage, die zwischen Ansteckung und ersten Symptome vergeht. Person ist bereits ansteckend.', floor: 1, ceil: 10, step: 1, formControlName: 'daysIncubated'}">
+              <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Inkubationszeit', tooltip: 'Anzahl Tage, die zwischen Ansteckung und ersten Symptome vergeht. Person ist bereits ansteckend.', floor: 1, ceil: 10, step: 1, propertyName: 'daysIncubated'}">
               </ng-container>
 
-              <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Infektionszeit', tooltip: 'Anzahl Tage, die zwischen ersten Symptomen und Ende der Infektion vergeht. Person ist weiterhin ansteckend, hat aber eine Chance sich zu Isolieren.', floor: 1, ceil: 10, step: 1, formControlName: 'daysSymptomatic'}">
+              <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Infektionszeit', tooltip: 'Anzahl Tage, die zwischen ersten Symptomen und Ende der Infektion vergeht. Person ist weiterhin ansteckend, hat aber eine Chance sich zu Isolieren.', floor: 1, ceil: 10, step: 1, propertyName: 'daysSymptomatic'}">
               </ng-container>
 
-              <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Isolationsrate', tooltip: 'Anteil aktiv Infizierter, die sich in Isolation begeben. Isolierte haben nur noch ein Zehntel der allgemeinen Ansteckungswahrscheinlichkeit.', floor: 0, ceil: 1, step: 0.05, formControlName: 'isolationRateSymptomatic'}">
+              <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Isolationsrate', tooltip: 'Anteil aktiv Infizierter, die sich in Isolation begeben. Isolierte haben nur noch ein Zehntel der allgemeinen Ansteckungswahrscheinlichkeit.', floor: 0, ceil: 1, step: 0.05, propertyName: 'isolationRateSymptomatic'}">
               </ng-container>
 
-              <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Übertragungsrate', tooltip: 'Allgemeine Ansteckungswahrscheinlichkeit', floor: 0, ceil: 1, step: 0.05, formControlName: 'transmissionProbability'}">
+              <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Übertragungsrate', tooltip: 'Allgemeine Ansteckungswahrscheinlichkeit', floor: 0, ceil: 1, step: 0.05, propertyName: 'transmissionProbability'}">
               </ng-container>
             </div>
 
             <div fxFlex=50>
-              <ng-container *ngTemplateOutlet="labeledSlider; context:{name: '2. Infektion', tooltip: 'Ansteckungswahrscheinlichkeit für eine Neuinfektion, nachdem man bereits erstmals geheilt war.', floor: 0, ceil: 1, step: 0.05, formControlName: 'reInfectionRate'}">
+              <ng-container *ngTemplateOutlet="labeledSlider; context:{name: '2. Infektion', tooltip: 'Ansteckungswahrscheinlichkeit für eine Neuinfektion, nachdem man bereits erstmals geheilt war.', floor: 0, ceil: 1, step: 0.05, propertyName: 'reInfectionRate'}">
               </ng-container>
 
-              <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Mortalitätsrate', tooltip: 'Anteil der Infizierten, die an ihrer Erkrankung versterben.', floor: 0, ceil: 1, step: 0.01, formControlName: 'deathRate'}">
+              <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Mortalitätsrate', tooltip: 'Anteil der Infizierten, die an ihrer Erkrankung versterben.', floor: 0, ceil: 1, step: 0.01, propertyName: 'deathRate'}">
               </ng-container>
 
-              <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Tägliche Kontakte', tooltip: 'Anzahl der Personen, mit denen jeder Einzelne täglich Kontakt hat. Sind dies mehr als in Ihrem Bewegungsradius möglich, werden Einzelne aus letzterer Gruppe mit erhöhter Wahrscheinlichkeit infiziert.', floor: 0, ceil: 10, step: 1, formControlName: 'numberOfContacts'}">
+              <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Tägliche Kontakte', tooltip: 'Anzahl der Personen, mit denen jeder Einzelne täglich Kontakt hat. Sind dies mehr als in Ihrem Bewegungsradius möglich, werden Einzelne aus letzterer Gruppe mit erhöhter Wahrscheinlichkeit infiziert.', floor: 0, ceil: 10, step: 1, propertyName: 'numberOfContacts'}">
               </ng-container>
 
-              <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Bewegungsradius', tooltip: 'Distamz, wie weit weg Personen reisen und sich somit gegenfalls infizieren können.', floor: 0, ceil: 10, step: 1, formControlName: 'movementRadius'}">
+              <ng-container *ngTemplateOutlet="labeledSlider; context:{name: 'Bewegungsradius', tooltip: 'Distamz, wie weit weg Personen reisen und sich somit gegenfalls infizieren können.', floor: 0, ceil: 10, step: 1, propertyName: 'movementRadius'}">
               </ng-container>
             </div>
           </div>
@@ -55,25 +55,25 @@
       <mat-card-actions>
         <div fxLayout="row" fxLayoutAlign="start stretch">
           <div class="pr-16 border-right">
-            <button mat-icon-button *ngIf="simulationEnded" (click)="reset()">
+            <button mat-icon-button *ngIf="(simulationStepService.simulationEnded | async)" (click)="reset()">
               <mat-icon matTooltip="Erneut starten">replay</mat-icon>
             </button>
 
-            <button mat-icon-button *ngIf=" !simulationEnded && !timerRunning" (click)="toggleSimulationExecution()">
+            <button mat-icon-button *ngIf="!(simulationStepService.simulationEnded | async) && !timerRunning" (click)="toggleSimulationExecution()">
               <mat-icon matTooltip="Play">play_circle_outline</mat-icon>
             </button>
 
-            <button mat-icon-button *ngIf="!simulationEnded && timerRunning" (click)="toggleSimulationExecution()">
+            <button mat-icon-button *ngIf="!(simulationStepService.simulationEnded | async) && timerRunning" (click)="toggleSimulationExecution()">
               <mat-icon matTooltip="Pause">pause_circle_outline</mat-icon>
             </button>
 
-            <button mat-icon-button (click)="singleStep()" [disabled]="simulationEnded || timerRunning">
+            <button mat-icon-button (click)="singleStep()" [disabled]="(simulationStepService.simulationEnded | async) || timerRunning">
               <mat-icon matTooltip="Einzelner Schritt">redo</mat-icon>
             </button>
           </div>
 
           <div class="pl-16">
-            Geschwindigkeit {{currentStepsPerSecond}}
+            Geschwindigkeit {{ currentStepsPerSecond }}
             <mat-slider [min]="1" [max]="20" [step]="1"
                         [ngModel]="currentStepsPerSecond" (input)="currentStepsPerSecond = $event.value; intervalPeriod.next(1000 / $event.value);">
             </mat-slider>
@@ -86,7 +86,7 @@
   </div>
 </div>
 
-<ng-template #labeledSlider let-name="name" let-tooltip="tooltip" let-min="floor" let-max="ceil" let-step="step" let-property="formControlName">
+<ng-template #labeledSlider let-name="name" let-tooltip="tooltip" let-min="floor" let-max="ceil" let-step="step" let-property="propertyName">
   <div fxLayout="column" fxLayoutAlign="start stretch" class="px-16">
     <div fxLayout="row" fxLayoutAlign="space-between stretch">
       <label>
