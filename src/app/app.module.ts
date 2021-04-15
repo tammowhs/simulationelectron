@@ -15,11 +15,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSliderModule } from '@angular/material/slider';
 import { PlayingFieldComponent } from './playing-field/playing-field.component';
+import { StatisticComponent } from './statistic/statistic.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    PlayingFieldComponent
+    PlayingFieldComponent,
+    StatisticComponent
   ],
   imports: [
     BrowserModule,

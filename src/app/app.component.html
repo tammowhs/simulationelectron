@@ -43,29 +43,7 @@
     </div>
 
     <div #statistic fxFlex="60" class="p-ex-top-16">
-      <mat-card class="statistic-card">
-        <mat-card-header>
-          <div class="w-100" fxLayout="row" fxLayoutAlign="space-between stretch">
-            <div>
-              <mat-card-title>Statistik</mat-card-title>
-              <mat-card-subtitle>Tag: {{ simulationStepService.day | async }}</mat-card-subtitle>
-            </div>
-            <div>
-              <button mat-button (click)="resetStatistics()" [disabled]="!simulationEnded">Zurücksetzen</button>
-            </div>
-          </div>
-        </mat-card-header>
-        <mat-card-content class="statistic-card-content">
-          <canvas baseChart class="statistic-canvas"
-                  [chartType]="'line'"
-                  [labels]="lineChartLabels"
-                  [datasets]="lineChartData"
-                  [options]="lineChartOptions"
-                  [colors]="lineChartColors"
-                  [legend]="true">
-          </canvas>
-        </mat-card-content>
-      </mat-card>
+      <app-statistic></app-statistic>
     </div>
   </div>
 
