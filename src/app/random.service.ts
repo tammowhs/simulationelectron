@@ -5,11 +5,11 @@ import { Injectable } from '@angular/core';
 })
 export class RandomService {
 
-  random(): number {
+  public random(): number {
     return Math.random();
   }
 
-  randomInRange(min: number, max: number): number {
+  public randomInRange(min: number, max: number): number {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 }

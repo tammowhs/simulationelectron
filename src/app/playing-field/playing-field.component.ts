@@ -1,7 +1,6 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { GridNode } from '../grid-node';
 import { GridStateColor } from '../grid-state.enum';
-import { MetaParameter } from '../meta-parameter';
 import { SimulationStepService } from '../simulation-step.service';
 
 @Component({
@@ -18,7 +17,7 @@ export class PlayingFieldComponent implements OnInit {
 
   constructor(private simulationStepService: SimulationStepService){ }
   
-  ngOnInit(): void {
+  public ngOnInit(): void {
     const nodeSize = this.simulationStepService.metaParam.nodeSize;
     
     const canvas = this.canvasRef.nativeElement;

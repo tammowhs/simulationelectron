@@ -1,10 +1,10 @@
 export class SimulationParameter {
-  daysIncubated: number;
-  daysSymptomatic: number;
-  isolationRateSymptomatic: number;
-  transmissionProbability: number;
-  deathRate: number;
-  movementRadius: number;
-  numberOfContacts: number;
-  reInfectionRate: number;
+  public daysIncubated: number;
+  public daysSymptomatic: number;
+  public isolationRateSymptomatic: number;
+  public transmissionProbability: number;
+  public deathRate: number;
+  public movementRadius: number;
+  public numberOfContacts: number;
+  public reInfectionRate: number;
 }

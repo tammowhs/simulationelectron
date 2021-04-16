@@ -1,7 +1,7 @@
 export class Statistic {
-  day: number;
-  infectious: number;
-  recovered: number;
-  deceased: number;
-  healthy: number;
+  public day: number;
+  public infectious: number;
+  public recovered: number;
+  public deceased: number;
+  public healthy: number;
 }

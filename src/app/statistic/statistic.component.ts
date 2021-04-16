@@ -52,7 +52,7 @@ export class StatisticComponent implements OnInit {
 
   constructor(public simulationStepService: SimulationStepService) { }
 
-  ngOnInit() {
+  public ngOnInit() {
     this.simulationStepService.statistics.subscribe(value => {
       const newestStatistic = value[value.length - 1];
       

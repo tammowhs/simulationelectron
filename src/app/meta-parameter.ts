@@ -1,6 +1,6 @@
 export class MetaParameter {
-  nRows: number;
-  nCols: number;
-  nodeSize: number;
-  stepsPerSecond: number;
+  public nRows: number;
+  public nCols: number;
+  public nodeSize: number;
+  public stepsPerSecond: number;
 }

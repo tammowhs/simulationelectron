@@ -31,7 +31,7 @@ export class AppComponent implements OnInit {
 
   constructor(public simulationStepService: SimulationStepService) { }
 
-  ngOnInit() {
+  public ngOnInit() {
     this.currentStepsPerSecond = this.simulationStepService.metaParam.stepsPerSecond;
     this.intervalPeriod = new BehaviorSubject<number>(1000 / this.currentStepsPerSecond);
 

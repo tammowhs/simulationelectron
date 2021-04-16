@@ -79,7 +79,7 @@ export class SimulationStepService {
   }
 
   private tryToInfect(node: GridNode, currentParams: SimulationParameter) {
-    if (node.isInfectious) {
+    if (node.isInfected || node.isExposed) {
       const contacts: GridNode[] = this.findContacts(node.rowIndex, node.colIndex, currentParams.movementRadius, currentParams.numberOfContacts);
 
       let transmissionProb = currentParams.transmissionProbability;
@@ -133,7 +133,7 @@ export class SimulationStepService {
                               currentParams.deathRate,
                               currentParams.isolationRateSymptomatic);
 
-        if (node.isInfectious) {
+        if (node.isInfected || node.isExposed) {
           currentlyInfectious++;
         }
 

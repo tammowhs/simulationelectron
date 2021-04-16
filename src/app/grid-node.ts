@@ -16,40 +16,36 @@ export class GridNode {
     this.colIndex = colIndex;
   }
 
-  get state() {
+  public get state() {
     return this._state;
   }
 
-  get isReceptive() {
+  public get isReceptive() {
     return this._state === GridState.Receptive;
   }
 
-  get isExposed() {
+  public get isExposed() {
     return this._state === GridState.Exposed;
   }
 
-  get isInfected() {
+  public get isInfected() {
     return this._state === GridState.Infected;
   }
 
-  get isRecovered() {
+  public get isRecovered() {
     return this._state === GridState.Recovered;
   }
 
-  get isDeceased() {
+  public get isDeceased() {
     return this._state === GridState.Deceased;
   }
 
-  get isInfectious() {
-    return this._state === GridState.Exposed || this._state === GridState.Infected;
-  }
-
-  get isIsolating() {
+  public get isIsolating() {
     return this.isolating;
   }
 
   // allowDeaths: boolean, deathRate: number
-  evaluateNewState(daysIncubating: number, daysSymptomatic: number, deathRate: number, isolationRate: number) {
+  public evaluateNewState(daysIncubating: number, daysSymptomatic: number, deathRate: number, isolationRate: number) {
     if (this.nextState !== this.state) {
       this.daysInCurrentState = 0;
       this._state = this.nextState;
@@ -77,7 +73,7 @@ export class GridNode {
     }
   }
 
-  tryToInfect(contact: GridNode, transProb: number, reInfectionRate: number) {
+  public tryToInfect(contact: GridNode, transProb: number, reInfectionRate: number) {
     if (contact.isReceptive && this.randomService.random() < transProb
       || contact.isRecovered && this.randomService.random() < reInfectionRate) {
       contact.nextState = GridState.Exposed;
